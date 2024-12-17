@@ -1,0 +1,53 @@
+/* admin-theme.css */
+
+/* Card Styles */
+.card {
+  cursor: pointer;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-primary {
+  background-color: var(--highlight-color); /* Gold */
+  color: var(--white);
+}
+
+.card-secondary {
+  background-color: var(--primary-color); /* Dark Blue */
+  color: var(--white);
+}
+
+/* Adjusted Title Color for Better Readability on Dark Backgrounds */
+.card-secondary .card-title {
+  color: var(--highlight-color);
+}
+
+.card-tertiary {
+  background-color: var(--text-color); /* Dark Gray */
+  color: var(--white);
+}
+
+.card-tertiary .card-title {
+  color: #f0f4fa;
+}
+
+/* Card Text Styles */
+.card-title {
+  font-size: 1.25rem;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card-value {
+  font-size: 2rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}

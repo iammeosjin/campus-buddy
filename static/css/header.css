@@ -1,0 +1,80 @@
+/* admin-theme.css */
+
+/* Header Styles */
+.header {
+  background-color: var(--primary-color); /* Dark Blue */
+  color: var(--white);
+  padding: 1rem 0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-title {
+  font-size: 1.75rem;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 700;
+  color: var(--highlight-color); /* Gold */
+}
+
+/* Menu Toggle Button (Mobile Only) */
+.menu-toggle {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Navigation Styles */
+.nav-links {
+  display: none; /* Initially hidden on mobile, toggled by menu button */
+  flex-direction: column;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.nav-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link {
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+  padding-bottom: 2px;
+}
+
+.nav-link:hover {
+  color: var(--highlight-color);
+}
+
+/* Active Link Indicator */
+.nav-link.active {
+  border-bottom: 2px solid var(--highlight-color); /* Gold underline */
+  color: var(--highlight-color);
+}
+
+/* Responsive Adjustments */
+@media (min-width: 640px) { /* sm breakpoint in Tailwind (or adjust as needed) */
+  .menu-toggle {
+    display: none; /* Hide menu toggle button on larger screens */
+  }
+
+  .nav-links {
+    display: flex; /* Show links horizontally on larger screens */
+    flex-direction: row;
+    width: auto;
+    margin-top: 0;
+  }
+
+  .nav-link {
+    padding: 0 0.5rem;
+  }
+}
