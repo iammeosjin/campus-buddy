@@ -1,8 +1,8 @@
 // components/Header.tsx
 import { useEffect, useState } from 'preact/hooks';
 
-export default function Header() {
-  const [activePage, setActivePage] = useState('');
+export default function Header(params: { activePage: string }) {
+  const [activePage, setActivePage] = useState(params.activePage);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {

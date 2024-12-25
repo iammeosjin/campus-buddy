@@ -1,6 +1,6 @@
 // routes/api/reservations.ts
 import { Handlers } from '$fresh/server.ts';
-import { ReservationDoc } from '../../type.ts';
+import { ReservationDoc } from '../../types.ts';
 
 // Mock Database (Replace with real database queries)
 const reservations: ReservationDoc[] = [

@@ -1,6 +1,6 @@
 // components/ResourceList.tsx
 import { useEffect, useState } from 'preact/hooks';
-import { Resource } from '../type.ts';
+import { Resource } from '../types.ts';
 
 // Mock API call function
 const fetchResources = () => {

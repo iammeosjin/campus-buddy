@@ -45,7 +45,7 @@ h1, h2, h3 {
 
 /* Button Styles */
 .button-primary {
-  background-color: var(--highlight-color);
+  background-color: var(--primary-color);
   color: var(--white);
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
@@ -55,7 +55,7 @@ h1, h2, h3 {
 }
 
 .button-primary:hover {
-  background-color: #b4862c; /* Darker shade on hover */
+  background-color: #395feb; /* Darker shade on hover */
 }
 
 .button-secondary {
@@ -70,4 +70,34 @@ h1, h2, h3 {
 
 .button-secondary:hover {
   background-color: #e55347; /* Darker red on hover */
+}
+
+
+/* Add your existing CSS and styles for buttons, table, etc. */
+/* Example for pagination button styles */
+.pagination button {
+  font-size: 0.875rem; /* Text size equivalent to text-sm */
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+  background-color: var(--white);
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background-color: var(--highlight-color);
+  color: var(--white);
+}
+
+.pagination .active {
+  background-color: var(--highlight-color);
+  color: var(--white);
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem; /* Adjust spacing between buttons and numbers */
 }

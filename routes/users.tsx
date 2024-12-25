@@ -1,9 +1,21 @@
 // routes/users.tsx
+import { Handlers } from '$fresh/server.ts';
 import { Head } from '$fresh/runtime.ts';
 import Header from '../islands/Header.tsx';
 import UserTable from '../islands/UserTable.tsx';
+import UserModel from '../models/user.ts';
+import { User } from '../types.ts';
 
-export default function Users() {
+export const handler: Handlers = {
+  async GET(_, ctx) {
+    const users = await UserModel.list();
+    return ctx.render({
+      users,
+    });
+  },
+};
+
+export default function Users({ data }: { data: { users: User[] } }) {
   return (
     <>
       <Head>
@@ -20,7 +32,7 @@ export default function Users() {
       <Header activePage='/users' />
       <div class='p-4'>
         <h1 class='text-3xl font-bold mb-6'>Manage Users</h1>
-        <UserTable />
+        <UserTable users={data.users} />
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 // components/ReservationCalendar.tsx
 import { useEffect, useState } from 'preact/hooks';
-import { ReservationDoc } from '../type.ts';
+import { ReservationDoc } from '../types.ts';
 
 // Mock API call function
 const fetchReservations = (): Promise<ReservationDoc[]> => {

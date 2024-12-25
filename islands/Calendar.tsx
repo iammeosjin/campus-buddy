@@ -1,6 +1,6 @@
 // islands/Calendar.tsx
 import { useEffect, useState } from 'preact/hooks';
-import { Reservation } from '../type.ts';
+import { Reservation } from '../types.ts';
 
 export default function Calendar() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
