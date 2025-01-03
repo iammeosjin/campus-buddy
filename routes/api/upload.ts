@@ -43,11 +43,13 @@ export const handler: Handlers = {
             if (await UserModel.getUserByEmail(email)) return;
           }
 
+          const sid = user['Schoold ID'];
+
           try {
             await UserModel.insertUser({
-              sid: user['Schoold ID'],
+              sid: sid,
               name: user['Name'].toLowerCase(),
-              email: user['Email'],
+              email: email,
               status: UserStatus.INACTIVE,
               role: UserRole.STUDENT,
             });

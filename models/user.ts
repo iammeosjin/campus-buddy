@@ -1,6 +1,7 @@
 import ResourceAlreadyExists from '../errors/resource-already-exists.ts';
 import DefaultModel from '../library/model.ts';
 import { ID, User } from '../types.ts';
+import mergeDeepRight from 'https://deno.land/x/ramda@v0.27.2/source/mergeDeepRight.js';
 
 class Model extends DefaultModel<User> {
   override getPrefix() {
@@ -13,6 +14,21 @@ class Model extends DefaultModel<User> {
     const res = await this.kv.atomic()
       .check({ key: primaryKey, versionstamp: null })
       .check({ key: byEmailKey, versionstamp: null })
+      .set(primaryKey, user)
+      .set(byEmailKey, user)
+      .commit();
+    if (!res.ok) {
+      throw new ResourceAlreadyExists('User with ID or email already exists');
+    }
+  }
+
+  async updateUser(id: ID, update: Partial<Omit<User, 'id'>>) {
+    const getRes = await this.kv.get<User>([this.getPrefix(), ...id]);
+    if (getRes.value === null) return;
+    const user = mergeDeepRight(getRes.value, update);
+    const primaryKey = [this.getPrefix(), user.sid];
+    const byEmailKey = [`${this.getPrefix()}_by_email`, user.email];
+    const res = await this.kv.atomic()
       .set(primaryKey, user)
       .set(byEmailKey, user)
       .commit();

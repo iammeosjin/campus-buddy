@@ -7,6 +7,8 @@ import * as $_app from './routes/_app.tsx';
 import * as $api_joke from './routes/api/joke.ts';
 import * as $api_reservations from './routes/api/reservations.ts';
 import * as $api_upload from './routes/api/upload.ts';
+import * as $api_users from './routes/api/users.ts';
+import * as $api_users_user_ from './routes/api/users/[user].ts';
 import * as $dashboard from './routes/dashboard.tsx';
 import * as $greet_name_ from './routes/greet/[name].tsx';
 import * as $index from './routes/index.tsx';
@@ -30,6 +32,8 @@ const manifest = {
 		'./routes/api/joke.ts': $api_joke,
 		'./routes/api/reservations.ts': $api_reservations,
 		'./routes/api/upload.ts': $api_upload,
+		'./routes/api/users.ts': $api_users,
+		'./routes/api/users/[user].ts': $api_users_user_,
 		'./routes/dashboard.tsx': $dashboard,
 		'./routes/greet/[name].tsx': $greet_name_,
 		'./routes/index.tsx': $index,

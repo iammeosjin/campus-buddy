@@ -101,3 +101,17 @@ h1, h2, h3 {
   align-items: center;
   gap: 0.25rem; /* Adjust spacing between buttons and numbers */
 }
+
+.button-secondary {
+  background-color: var(--error-color);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.button-secondary:hover {
+  background-color: #e55347; /* Darker red on hover */
+}
