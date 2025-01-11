@@ -1,30 +1,19 @@
 // deno-lint-ignore-file no-explicit-any
 // components/ResourceList.tsx
 import { useState } from 'preact/hooks';
-import { Resource, ResourceStatus } from '../types.ts';
+import { Operator, OperatorRole, Resource, ResourceStatus } from '../types.ts';
 import FileUpload from './FileUpload.tsx';
 import { toName } from '../library/to-name.ts';
 
-export default function ResourceList(params: { resources: Resource[] }) {
-  const [resources, setResources] = useState<Resource[]>([
-    {
-      id: ['1'],
-      name: 'Library Room A',
-      capacity: 20,
-      location: 'Building A',
-      status: ResourceStatus.AVAILABLE,
-      creator: ['1'],
-    },
-    {
-      id: ['2'],
-      name: 'Lab Room B',
-      capacity: 15,
-      location: 'Building B',
-      status: ResourceStatus.UNAVAILABLE,
-      remarks: 'Under Maintenance',
-      creator: ['1'],
-    },
-  ]);
+export default function ResourceList(
+  params: {
+    resources: (Omit<Resource, 'creator'> & { creator: Operator })[];
+    operator: Operator;
+  },
+) {
+  const [resources, setResources] = useState<
+    (Omit<Resource, 'creator'> & { creator: Operator })[]
+  >(params.resources);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -36,10 +25,10 @@ export default function ResourceList(params: { resources: Resource[] }) {
   const itemsPerPage = 10;
 
   const handleDelete = async (sid: string) => {
-    const response = await fetch(`/api/users/${sid}`, { method: 'DELETE' });
+    const response = await fetch(`/api/resources/${sid}`, { method: 'DELETE' });
     if (!response.ok) return;
     const updatedUsers = resources.filter((resource) =>
-      resource.id !== sid.split(';')
+      resource.id.join(';') !== sid
     );
     setResources(updatedUsers);
   };
@@ -56,14 +45,17 @@ export default function ResourceList(params: { resources: Resource[] }) {
       method: 'POST',
       body: JSON.stringify({
         ...resource,
-        creator: ['1'],
+        creator: params.operator.id,
       }),
     });
 
     if (!response.ok) return;
 
     const res = await response.json();
-    setResources([...resources, res as Resource]);
+    setResources([...resources, {
+      ...res,
+      creator: params.operator,
+    }]);
     setIsModalOpen(false);
     setResource({
       status: ResourceStatus.AVAILABLE,
@@ -74,9 +66,7 @@ export default function ResourceList(params: { resources: Resource[] }) {
     if (!resource) return;
     const response = await fetch(`/api/resources/${resource.id?.join(';')}`, {
       method: 'PATCH',
-      body: JSON.stringify({
-        ...resource,
-      }),
+      body: JSON.stringify(resource),
     });
     if (!response.ok) return;
     setIsUpdate(false);
@@ -86,9 +76,20 @@ export default function ResourceList(params: { resources: Resource[] }) {
     });
   };
 
-  const totalPages = Math.ceil(resources.length / itemsPerPage);
+  // Filtered users based on search term
+  const filteredUsers = resources.filter(
+    (resource) =>
+      resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.remarks?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.creator.username.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+      ),
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const list = resources.slice(
+  const list = filteredUsers.slice(
     startIndex,
     startIndex + itemsPerPage,
   );
@@ -107,7 +108,7 @@ export default function ResourceList(params: { resources: Resource[] }) {
               setSearchTerm(((e.target as any)?.value || '') as string)}
           />
           <div class='flex space-x-2'>
-            <FileUpload uploadType='resources' />
+            <FileUpload uploadType='resources' operator={params.operator} />
             <button
               class='button-primary'
               onClick={() => {
@@ -129,17 +130,27 @@ export default function ResourceList(params: { resources: Resource[] }) {
               <th>Location</th>
               <th>Status</th>
               <th>Remarks</th>
+              {params.operator.role === OperatorRole.ADMIN
+                ? <th>Creator</th>
+                : <></>}
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {list.map((index) => (
               <tr key={index.id.join('-')}>
-                <td>{toName(index.name)}</td>
+                <td>
+                  <b>{toName(index.name)}</b>
+                </td>
                 <td>{index.capacity}</td>
                 <td>{index.location}</td>
-                <td>{index.status}</td>
+                <td>
+                  <b>{index.status}</b>
+                </td>
                 <td>{index.remarks}</td>
+                {params.operator.role === OperatorRole.ADMIN
+                  ? <td>{index.creator.username}</td>
+                  : <></>}
                 <td>
                   <div class='flex space-x-2'>
                     <button
@@ -151,7 +162,10 @@ export default function ResourceList(params: { resources: Resource[] }) {
                     <button
                       class='button-primary'
                       onClick={() => {
-                        setResource(index);
+                        setResource({
+                          ...index,
+                          creator: index.creator.id,
+                        });
                         setIsUpdate(true);
                         setIsModalOpen(true);
                       }}
@@ -273,7 +287,7 @@ export default function ResourceList(params: { resources: Resource[] }) {
               </select>
               <input
                 type='text'
-                placeholder='Location'
+                placeholder='Remarks'
                 class='border border-gray-300 rounded-md p-2 w-full'
                 value={resource.remarks}
                 onInput={(e) =>

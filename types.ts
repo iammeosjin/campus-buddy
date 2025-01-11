@@ -60,8 +60,13 @@ export type Operator = {
 export type Reservation = {
   id: ID;
   resource: ID;
-  name: string;
-  userName: string;
-  date: string;
-  time: string;
+  user: ID;
+  creator: ID;
+  guid: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  dateStarted: string;
+  dateEnded: string;
+  dateTimeStarted: string;
+  dateTimeEnded: string;
+  remarks?: string;
 };

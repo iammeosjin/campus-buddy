@@ -23,6 +23,8 @@ import * as $operators from './routes/operators.tsx';
 import * as $operators_reservations from './routes/operators/reservations.tsx';
 import * as $operators_resources from './routes/operators/resources.tsx';
 import * as $operators_users from './routes/operators/users.tsx';
+import * as $reservations from './routes/reservations.tsx';
+import * as $resources from './routes/resources.tsx';
 import * as $users from './routes/users.tsx';
 import * as $Calendar from './islands/Calendar.tsx';
 import * as $Counter from './islands/Counter.tsx';
@@ -59,6 +61,8 @@ const manifest = {
 		'./routes/operators/reservations.tsx': $operators_reservations,
 		'./routes/operators/resources.tsx': $operators_resources,
 		'./routes/operators/users.tsx': $operators_users,
+		'./routes/reservations.tsx': $reservations,
+		'./routes/resources.tsx': $resources,
 		'./routes/users.tsx': $users,
 	},
 	islands: {

@@ -1,6 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
 
-async function handleFileUpload(e: Event, uploadType: string) {
+import { Operator } from '../types.ts';
+
+async function handleFileUpload(
+  e: Event,
+  uploadType: string,
+  operator?: Operator,
+) {
   e.preventDefault();
   const file = (e.target as any).files.item(0) as File;
   const data = await file.text();
@@ -10,7 +16,10 @@ async function handleFileUpload(e: Event, uploadType: string) {
       'Content-Type': 'application/json',
       'Upload-Type': uploadType,
     },
-    body: data,
+    body: JSON.stringify({
+      data,
+      operator,
+    }),
   });
   if (response.status === 400) {
     alert(await response.text());
@@ -20,7 +29,9 @@ async function handleFileUpload(e: Event, uploadType: string) {
   alert('Done');
 }
 
-export default function FileUpload(params: { uploadType: string }) {
+export default function FileUpload(
+  params: { uploadType: string; operator?: Operator },
+) {
   return (
     <div class='mr-1 button-primary'>
       <label for='fileUpload'>
@@ -35,7 +46,8 @@ export default function FileUpload(params: { uploadType: string }) {
         class='hidden'
         accept='.csv'
         multiple={false}
-        onChange={(e) => handleFileUpload(e, params.uploadType)}
+        onChange={(e) =>
+          handleFileUpload(e, params.uploadType, params.operator)}
       />
     </div>
   );

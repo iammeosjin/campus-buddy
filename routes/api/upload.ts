@@ -3,12 +3,15 @@ import { Handlers } from '$fresh/server.ts';
 import Bluebird from 'npm:bluebird';
 import UserModel from '../../models/user.ts';
 import { parse } from 'https://deno.land/std@0.212.0/csv/mod.ts';
-import { UserRole, UserStatus } from '../../types.ts';
+import { Operator, ResourceStatus, UserRole, UserStatus } from '../../types.ts';
+import ResourceModel from '../../models/resource.ts';
 
 export const handler: Handlers = {
   async POST(req) {
-    const data = await req.text();
+    const body = await req.json();
     const type = req.headers.get('Upload-Type');
+    const data = body.data;
+    const oparator: Operator = body.operator;
     if (!data || !type) {
       return new Response(null, {
         status: 200,
@@ -69,7 +72,7 @@ export const handler: Handlers = {
     }
 
     if (type === 'resources') {
-      const users = parse(
+      const resources = parse(
         data,
         {
           skipFirstRow: true, // Skip the header row
@@ -81,10 +84,35 @@ export const handler: Handlers = {
         Status: string;
         Remarks: string;
       }[];
-
-      const existingEmails = new Set<string>();
+      const existingNames = new Set<string>();
 
       try {
+        await Bluebird.mapSeries(resources, async (res) => {
+          if (!res['Name']) {
+            throw new Error(
+              `Resource ${res['Name']} does not followed the criteria.`,
+            );
+          }
+          const name = res['Name'];
+          if (name && existingNames.has(name)) return;
+
+          try {
+            const id = [crypto.randomUUID()];
+            await ResourceModel.insert({
+              name,
+              capacity: parseInt(res['Capacity']),
+              location: res['Location'],
+              status: res['Status'] as ResourceStatus,
+              remarks: res['Remarks'],
+              creator: oparator.id,
+              id,
+            });
+          } catch (error) {
+            if (error.name !== 'RESOURCE_ALREADY_EXISTS') {
+              throw error;
+            }
+          }
+        });
       } catch (error) {
         console.error(error);
         return new Response(error.message, {
