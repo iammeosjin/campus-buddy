@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 // routes/login.tsx
 import { useState } from 'preact/hooks';
-import { OperatorRole } from '../types.ts';
 
 export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('');
@@ -15,10 +14,7 @@ export default function LoginPage() {
     });
 
     if (response.ok) {
-      const result = await response.json();
-      if (result.role === OperatorRole.OPERATOR) {
-        return globalThis.location.href = '/admin';
-      }
+      await response.json();
 
       globalThis.location.href = '/dashboard';
     } else if (response.status === 401) {

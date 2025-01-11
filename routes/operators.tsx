@@ -17,16 +17,34 @@ export const handler: Handlers = {
       });
     }
 
+    const operator = await OperatorModel.get([username]);
+    if (!operator) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/logout' }, // Redirect to home if already logged in
+      });
+    }
+
+    if (operator.role !== OperatorRole.ADMIN) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/logout' }, // Redirect to home if already logged in
+      });
+    }
+
     const operators = await OperatorModel.list();
     return ctx.render({
       operators: operators.filter((operator) =>
         operator.role === OperatorRole.OPERATOR
       ),
+      operator,
     });
   },
 };
 
-export default function Users({ data }: { data: { operators: Operator[] } }) {
+export default function Users(
+  { data }: { data: { operators: Operator[]; operator: Operator } },
+) {
   return (
     <>
       <Head>
@@ -40,7 +58,7 @@ export default function Users({ data }: { data: { operators: Operator[] } }) {
           rel='stylesheet'
         />
       </Head>
-      <Header activePage='/operators' />
+      <Header activePage='/operators' operator={data.operator} />
       <div class='p-4'>
         <h1 class='text-3xl font-bold mb-6'>Manage Operators</h1>
         <OperatorTable operators={data.operators} />

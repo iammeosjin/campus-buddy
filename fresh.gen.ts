@@ -20,9 +20,6 @@ import * as $index from './routes/index.tsx';
 import * as $login from './routes/login.tsx';
 import * as $logout from './routes/logout.tsx';
 import * as $operators from './routes/operators.tsx';
-import * as $operators_reservations from './routes/operators/reservations.tsx';
-import * as $operators_resources from './routes/operators/resources.tsx';
-import * as $operators_users from './routes/operators/users.tsx';
 import * as $reservations from './routes/reservations.tsx';
 import * as $resources from './routes/resources.tsx';
 import * as $users from './routes/users.tsx';
@@ -58,9 +55,6 @@ const manifest = {
 		'./routes/login.tsx': $login,
 		'./routes/logout.tsx': $logout,
 		'./routes/operators.tsx': $operators,
-		'./routes/operators/reservations.tsx': $operators_reservations,
-		'./routes/operators/resources.tsx': $operators_resources,
-		'./routes/operators/users.tsx': $operators_users,
 		'./routes/reservations.tsx': $reservations,
 		'./routes/resources.tsx': $resources,
 		'./routes/users.tsx': $users,

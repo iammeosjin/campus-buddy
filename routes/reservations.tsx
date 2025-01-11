@@ -21,6 +21,7 @@ export const handler: Handlers = {
         headers: { Location: '/login' }, // Redirect to home if already logged in
       });
     }
+
     const operator = await OperatorModel.get([username]);
     if (!operator) {
       return new Response(null, {
@@ -109,7 +110,7 @@ export default function Reservations({ data }: {
           rel='stylesheet'
         />
       </Head>
-      <Header activePage='/reservations' />
+      <Header activePage='/reservations' operator={data.operator} />
       <div class='p-4'>
         <h1 class='text-3xl font-bold mb-6'>Manage Reservations</h1>
         <ReservationCalendar

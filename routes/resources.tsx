@@ -6,7 +6,7 @@ import Header from '../islands/Header.tsx';
 import Bluebird from 'npm:bluebird';
 import ResourceList from '../islands/ResourceList.tsx';
 import ResourceModel from '../models/resource.ts';
-import { Operator, Resource } from '../types.ts';
+import { Operator, OperatorRole, Resource } from '../types.ts';
 import OperatorModel from '../models/operator.ts';
 import { authorize } from '../middlewares/authorize.ts';
 
@@ -39,6 +39,12 @@ export const handler: Handlers = {
         }
 
         if (!creator) return null;
+
+        if (
+          operator.role === OperatorRole.OPERATOR &&
+          operator.id.join(';') !== creator.id.join(';')
+        ) return null;
+
         return {
           ...resource,
           creator,
@@ -72,7 +78,7 @@ export default function Resources(
           rel='stylesheet'
         />
       </Head>
-      <Header activePage='/resources' />
+      <Header activePage='/resources' operator={data.operator} />
       <div class='p-4'>
         <h1 class='text-3xl font-bold mb-6'>Manage Resources</h1>
         <ResourceList resources={data.resources} operator={data.operator} />

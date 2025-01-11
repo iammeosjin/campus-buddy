@@ -1,11 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
 import { useState } from 'preact/hooks';
 import FileUpload from '../islands/FileUpload.tsx';
-import { User, UserRole } from '../types.ts';
+import { Operator, User, UserRole } from '../types.ts';
 import { toName } from '../library/to-name.ts';
 import { UserStatus } from '../types.ts';
 
-export default function UserTable(params: { users: User[] }) {
+export default function UserTable(
+  params: { users: User[]; operator: Operator },
+) {
   const [users, setUsers] = useState(params.users);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -125,7 +127,7 @@ export default function UserTable(params: { users: User[] }) {
               <th>Email</th>
               <th>Role</th>
               <th>Status</th>
-              <th>Action</th> {/* New column for delete button */}
+              {params.operator.role === 'ADMIN' && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -136,26 +138,28 @@ export default function UserTable(params: { users: User[] }) {
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>{user.status}</td>
-                <td>
-                  <div class='flex space-x-2'>
-                    <button
-                      class='button-secondary'
-                      onClick={() => handleDelete(user.sid)}
-                    >
-                      Delete
-                    </button>
-                    <button
-                      class='button-primary'
-                      onClick={() => {
-                        setUser(user);
-                        setIsUpdate(true);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </td>
+                {params.operator.role === 'ADMIN' && (
+                  <td>
+                    <div class='flex space-x-2'>
+                      <button
+                        class='button-secondary'
+                        onClick={() => handleDelete(user.sid)}
+                      >
+                        Delete
+                      </button>
+                      <button
+                        class='button-primary'
+                        onClick={() => {
+                          setUser(user);
+                          setIsUpdate(true);
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        Update
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

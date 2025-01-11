@@ -4,9 +4,11 @@ import { Handlers } from '$fresh/server.ts';
 import Header from '../islands/Header.tsx';
 import DashboardSummary from '../islands/DashboardSummary.tsx';
 import { authorize } from '../middlewares/authorize.ts';
+import OperatorModel from '../models/operator.ts';
+import { Operator } from '../types.ts';
 
 export const handler: Handlers = {
-  GET(req, ctx) {
+  async GET(req, ctx) {
     const username = authorize(req);
     if (!username) {
       return new Response(null, {
@@ -15,11 +17,23 @@ export const handler: Handlers = {
       });
     }
 
-    return ctx.render();
+    const operator = await OperatorModel.get([username]);
+    if (!operator) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/logout' }, // Redirect to home if already logged in
+      });
+    }
+
+    return ctx.render({
+      operator,
+    });
   },
 };
 
-export default function Dashboard() {
+export default function Dashboard(
+  { data }: { data: { operator: Operator } },
+) {
   return (
     <>
       <Head>
@@ -37,7 +51,7 @@ export default function Dashboard() {
           rel='stylesheet'
         />
       </Head>
-      <Header activePage='/dashboard' />
+      <Header activePage='/dashboard' operator={data.operator} />
       <main class='container mx-auto p-6'>
         <h1
           class='text-4xl font-bold mb-6'
