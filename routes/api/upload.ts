@@ -14,6 +14,7 @@ export const handler: Handlers = {
         status: 200,
       });
     }
+
     if (type === 'users') {
       const users = parse(
         data,
@@ -59,6 +60,31 @@ export const handler: Handlers = {
             }
           }
         });
+      } catch (error) {
+        console.error(error);
+        return new Response(error.message, {
+          status: 400,
+        });
+      }
+    }
+
+    if (type === 'resources') {
+      const users = parse(
+        data,
+        {
+          skipFirstRow: true, // Skip the header row
+        },
+      ) as {
+        'Name': string;
+        Capacity: string;
+        Location: string;
+        Status: string;
+        Remarks: string;
+      }[];
+
+      const existingEmails = new Set<string>();
+
+      try {
       } catch (error) {
         console.error(error);
         return new Response(error.message, {

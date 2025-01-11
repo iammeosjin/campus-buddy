@@ -1,18 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
 import { useState } from 'preact/hooks';
-import FileUpload from '../islands/FileUpload.tsx';
-import { User, UserRole } from '../types.ts';
-import { toName } from '../library/to-name.ts';
-import { UserStatus } from '../types.ts';
-
-export default function UserTable(params: { users: User[] }) {
-  const [users, setUsers] = useState(params.users);
+import { Operator, OperatorRole } from '../types.ts';
+export default function UserTable(params: { operators: Operator[] }) {
+  const [users, setUsers] = useState(params.operators);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState<Partial<User>>({
-    status: UserStatus.ACTIVE,
-    role: UserRole.STUDENT,
+  const [user, setUser] = useState<Partial<Operator>>({
+    role: OperatorRole.OPERATOR,
   });
   const [isUpdate, setIsUpdate] = useState(false);
 
@@ -20,10 +15,7 @@ export default function UserTable(params: { users: User[] }) {
 
   // Filtered users based on search term
   const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase()),
+    (user) => user.username.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Pagination logic
@@ -41,42 +33,41 @@ export default function UserTable(params: { users: User[] }) {
   };
 
   // Handle user deletion
-  const handleDelete = async (sid: string) => {
-    const response = await fetch(`/api/users/${sid}`, { method: 'DELETE' });
+  const handleDelete = async (username: string) => {
+    const response = await fetch(`/api/operators/${username}`, {
+      method: 'DELETE',
+    });
     if (!response.ok) return;
-    const updatedUsers = users.filter((user) => user.sid !== sid);
+    const updatedUsers = users.filter((user) => user.username !== username);
     setUsers(updatedUsers);
   };
 
   // Handle new user submission
   const handleAddUser = async () => {
-    const response = await fetch(`/api/users`, {
+    const response = await fetch(`/api/operators`, {
       method: 'POST',
       body: JSON.stringify({
-        sid: user.sid,
-        name: user.name?.toLowerCase(),
-        email: user.email,
-        status: user.status,
+        username: user.username,
+        password: user.password?.toLowerCase(),
         role: user.role,
       }),
     });
 
     if (!response.ok) return;
 
-    setUsers([...users, user as User]);
+    setUsers([...users, user as Operator]);
     setIsModalOpen(false);
     setUser({
-      status: UserStatus.ACTIVE,
-      role: UserRole.STUDENT,
+      role: OperatorRole.OPERATOR,
     });
   };
 
   const handleUpdateUser = async () => {
-    const response = await fetch(`/api/users/${user.sid}`, {
+    const response = await fetch(`/api/operators/${user.username}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        name: user.name?.toLowerCase(),
-        status: user.status,
+        name: user.username?.toLowerCase(),
+        password: user.password?.toLowerCase(),
         role: user.role,
       }),
     });
@@ -84,8 +75,7 @@ export default function UserTable(params: { users: User[] }) {
     setIsUpdate(false);
     setIsModalOpen(false);
     setUser({
-      status: UserStatus.ACTIVE,
-      role: UserRole.STUDENT,
+      role: OperatorRole.OPERATOR,
     });
   };
 
@@ -103,7 +93,6 @@ export default function UserTable(params: { users: User[] }) {
               setSearchTerm(((e.target as any)?.value || '') as string)}
           />
           <div class='flex space-x-2'>
-            <FileUpload uploadType='users' />
             <button
               class='button-primary'
               onClick={() => {
@@ -111,7 +100,7 @@ export default function UserTable(params: { users: User[] }) {
                 setIsModalOpen(true);
               }}
             >
-              Create User
+              Create Operator
             </button>
           </div>
         </div>
@@ -120,27 +109,25 @@ export default function UserTable(params: { users: User[] }) {
         <table class='table'>
           <thead>
             <tr>
-              <th>School ID</th>
-              <th>Name</th>
-              <th>Email</th>
+              <th>Username</th>
+              <th>Password</th>
               <th>Role</th>
-              <th>Status</th>
               <th>Action</th> {/* New column for delete button */}
             </tr>
           </thead>
           <tbody>
             {currentUsers.map((user) => (
               <tr key={user.id}>
-                <td>{user.sid}</td>
-                <td>{toName(user.name)}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td>{user.status}</td>
+                <td>{user.username}</td>
+                <td>{new Array(user.password.length).fill('*').join('')}</td>
+                <td>
+                  <b>{user.role}</b>
+                </td>
                 <td>
                   <div class='flex space-x-2'>
                     <button
                       class='button-secondary'
-                      onClick={() => handleDelete(user.sid)}
+                      onClick={() => handleDelete(user.username)}
                     >
                       Delete
                     </button>
@@ -152,7 +139,7 @@ export default function UserTable(params: { users: User[] }) {
                         setIsModalOpen(true);
                       }}
                     >
-                      Update
+                      Update Password
                     </button>
                   </div>
                 </td>
@@ -218,55 +205,34 @@ export default function UserTable(params: { users: User[] }) {
             <div class='space-y-4'>
               <input
                 type='text'
-                placeholder='School ID'
+                placeholder='Username'
                 class='border border-gray-300 rounded-md p-2 w-full'
-                value={user.sid}
+                value={user.username}
                 disabled={isUpdate}
                 onInput={(e) =>
-                  setUser({ ...user, sid: e.currentTarget.value })}
+                  setUser({ ...user, username: e.currentTarget.value })}
               />
+              <input
+                type='password'
+                placeholder='Password'
+                class='border border-gray-300 rounded-md p-2 w-full'
+                value={user.password}
+                onInput={(e) =>
+                  setUser({ ...user, password: e.currentTarget.value })}
+              />
+
               <input
                 type='text'
-                placeholder='Name'
-                class='border border-gray-300 rounded-md p-2 w-full'
-                value={user.name}
-                onInput={(e) =>
-                  setUser({ ...user, name: e.currentTarget.value })}
-              />
-              <input
-                type='email'
-                placeholder='Email'
-                class='border border-gray-300 rounded-md p-2 w-full'
-                value={user.email}
-                disabled={isUpdate}
-                onInput={(e) =>
-                  setUser({ ...user, email: e.currentTarget.value })}
-              />
-              <select
+                placeholder='Role'
                 class='border border-gray-300 rounded-md p-2 w-full'
                 value={user.role}
+                disabled={true}
                 onInput={(e) =>
                   setUser({
                     ...user,
-                    role: e.currentTarget.value as UserRole,
+                    role: e.currentTarget.value as OperatorRole,
                   })}
-              >
-                <option value='STUDENT'>Student</option>
-                <option value='STAFF'>Staff</option>
-              </select>
-              <select
-                class='border border-gray-300 rounded-md p-2 w-full'
-                value={user.status}
-                onInput={(e) =>
-                  setUser({
-                    ...user,
-                    status: e.currentTarget.value as UserStatus,
-                  })}
-              >
-                <option value={UserStatus.ACTIVE}>Active</option>
-                <option value={UserStatus.INACTIVE}>Inactive</option>
-                <option value={UserStatus.SUSPENDED}>Suspended</option>
-              </select>
+              />
             </div>
             <div class='flex justify-end space-x-2 mt-4'>
               <button

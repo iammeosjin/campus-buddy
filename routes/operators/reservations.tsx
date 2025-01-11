@@ -1,7 +1,7 @@
 // routes/reservations.tsx
 import { Head } from '$fresh/runtime.ts';
-import Header from '../islands/Header.tsx';
-import ReservationCalendar from '../islands/ReservationCalendar.tsx';
+import Header from '../../islands/Header.tsx';
+import ReservationCalendar from '../../islands/ReservationCalendar.tsx';
 
 export default function Reservations() {
   return (

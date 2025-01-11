@@ -1,7 +1,9 @@
 // components/Header.tsx
 import { useEffect, useState } from 'preact/hooks';
 
-export default function Header(params: { activePage: string }) {
+export default function Header(
+  params: { activePage: string },
+) {
   const [activePage, setActivePage] = useState(params.activePage);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -45,6 +47,16 @@ export default function Header(params: { activePage: string }) {
             </li>
             <li>
               <a
+                href='/operators'
+                class={`nav-link ${
+                  activePage === '/operators' ? 'active' : ''
+                }`}
+              >
+                Operators
+              </a>
+            </li>
+            <li>
+              <a
                 href='/users'
                 class={`nav-link ${activePage === '/users' ? 'active' : ''}`}
               >
@@ -69,6 +81,16 @@ export default function Header(params: { activePage: string }) {
                 }`}
               >
                 Reservations
+              </a>
+            </li>
+            <li>
+              <a
+                href='/logout'
+                class={`nav-link ${
+                  activePage === '/reservations' ? 'active' : ''
+                }`}
+              >
+                Logout
               </a>
             </li>
           </ul>

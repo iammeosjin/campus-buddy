@@ -1,11 +1,11 @@
 // routes/users.tsx
 import { Handlers } from '$fresh/server.ts';
 import { Head } from '$fresh/runtime.ts';
-import Header from '../islands/Header.tsx';
-import UserTable from '../islands/UserTable.tsx';
-import UserModel from '../models/user.ts';
-import { User } from '../types.ts';
-import { authorize } from '../middlewares/authorize.ts';
+import Header from '../../islands/Header.tsx';
+import UserTable from '../../islands/UserTable.tsx';
+import UserModel from '../../models/user.ts';
+import { User } from '../../types.ts';
+import { authorize } from '../../middlewares/authorize.ts';
 
 export const handler: Handlers = {
   async GET(req, ctx) {

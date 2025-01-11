@@ -4,12 +4,13 @@ import ResourceModel from '../../models/resource.ts';
 
 export const handler: Handlers = {
   async POST(req) {
-    const newReservation = await req.json();
+    const body = await req.json();
     const id = [crypto.randomUUID()];
-    await ResourceModel.insert({
-      ...newReservation,
+    const newReservation = {
+      ...body,
       id,
-    });
+    };
+    await ResourceModel.insert(newReservation);
     return new Response(JSON.stringify(newReservation), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },

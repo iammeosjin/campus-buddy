@@ -2,10 +2,10 @@
 import { Handlers } from '$fresh/server.ts';
 import { Head } from '$fresh/runtime.ts';
 import Header from '../islands/Header.tsx';
-import UserTable from '../islands/UserTable.tsx';
-import UserModel from '../models/user.ts';
-import { User } from '../types.ts';
+import { Operator, OperatorRole } from '../types.ts';
 import { authorize } from '../middlewares/authorize.ts';
+import OperatorTable from '../islands/OperatorTable.tsx';
+import OperatorModel from '../models/operator.ts';
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -17,18 +17,20 @@ export const handler: Handlers = {
       });
     }
 
-    const users = await UserModel.list();
+    const operators = await OperatorModel.list();
     return ctx.render({
-      users,
+      operators: operators.filter((operator) =>
+        operator.role === OperatorRole.OPERATOR
+      ),
     });
   },
 };
 
-export default function Users({ data }: { data: { users: User[] } }) {
+export default function Users({ data }: { data: { operators: Operator[] } }) {
   return (
     <>
       <Head>
-        <title>CampusBuddy User Management</title>
+        <title>CampusBuddy Operator Management</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'
@@ -38,10 +40,10 @@ export default function Users({ data }: { data: { users: User[] } }) {
           rel='stylesheet'
         />
       </Head>
-      <Header activePage='/users' />
+      <Header activePage='/operators' />
       <div class='p-4'>
-        <h1 class='text-3xl font-bold mb-6'>Manage Users</h1>
-        <UserTable users={data.users} />
+        <h1 class='text-3xl font-bold mb-6'>Manage Operators</h1>
+        <OperatorTable operators={data.operators} />
       </div>
     </>
   );

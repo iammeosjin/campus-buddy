@@ -5,21 +5,32 @@
 import * as $_404 from './routes/_404.tsx';
 import * as $_app from './routes/_app.tsx';
 import * as $api_joke from './routes/api/joke.ts';
+import * as $api_login from './routes/api/login.ts';
+import * as $api_operators from './routes/api/operators.tsx';
+import * as $api_operators_username_ from './routes/api/operators/[username].tsx';
 import * as $api_reservations from './routes/api/reservations.ts';
+import * as $api_resources from './routes/api/resources.ts';
+import * as $api_resources_resource_ from './routes/api/resources/[resource].ts';
 import * as $api_upload from './routes/api/upload.ts';
 import * as $api_users from './routes/api/users.ts';
 import * as $api_users_user_ from './routes/api/users/[user].ts';
 import * as $dashboard from './routes/dashboard.tsx';
 import * as $greet_name_ from './routes/greet/[name].tsx';
 import * as $index from './routes/index.tsx';
-import * as $reservations from './routes/reservations.tsx';
-import * as $resources from './routes/resources.tsx';
+import * as $login from './routes/login.tsx';
+import * as $logout from './routes/logout.tsx';
+import * as $operators from './routes/operators.tsx';
+import * as $operators_reservations from './routes/operators/reservations.tsx';
+import * as $operators_resources from './routes/operators/resources.tsx';
+import * as $operators_users from './routes/operators/users.tsx';
 import * as $users from './routes/users.tsx';
 import * as $Calendar from './islands/Calendar.tsx';
 import * as $Counter from './islands/Counter.tsx';
 import * as $DashboardSummary from './islands/DashboardSummary.tsx';
 import * as $FileUpload from './islands/FileUpload.tsx';
 import * as $Header from './islands/Header.tsx';
+import * as $LoginPage from './islands/LoginPage.tsx';
+import * as $OperatorTable from './islands/OperatorTable.tsx';
 import * as $ReservationCalendar from './islands/ReservationCalendar.tsx';
 import * as $ResourceList from './islands/ResourceList.tsx';
 import * as $UserTable from './islands/UserTable.tsx';
@@ -30,15 +41,24 @@ const manifest = {
 		'./routes/_404.tsx': $_404,
 		'./routes/_app.tsx': $_app,
 		'./routes/api/joke.ts': $api_joke,
+		'./routes/api/login.ts': $api_login,
+		'./routes/api/operators.tsx': $api_operators,
+		'./routes/api/operators/[username].tsx': $api_operators_username_,
 		'./routes/api/reservations.ts': $api_reservations,
+		'./routes/api/resources.ts': $api_resources,
+		'./routes/api/resources/[resource].ts': $api_resources_resource_,
 		'./routes/api/upload.ts': $api_upload,
 		'./routes/api/users.ts': $api_users,
 		'./routes/api/users/[user].ts': $api_users_user_,
 		'./routes/dashboard.tsx': $dashboard,
 		'./routes/greet/[name].tsx': $greet_name_,
 		'./routes/index.tsx': $index,
-		'./routes/reservations.tsx': $reservations,
-		'./routes/resources.tsx': $resources,
+		'./routes/login.tsx': $login,
+		'./routes/logout.tsx': $logout,
+		'./routes/operators.tsx': $operators,
+		'./routes/operators/reservations.tsx': $operators_reservations,
+		'./routes/operators/resources.tsx': $operators_resources,
+		'./routes/operators/users.tsx': $operators_users,
 		'./routes/users.tsx': $users,
 	},
 	islands: {
@@ -47,6 +67,8 @@ const manifest = {
 		'./islands/DashboardSummary.tsx': $DashboardSummary,
 		'./islands/FileUpload.tsx': $FileUpload,
 		'./islands/Header.tsx': $Header,
+		'./islands/LoginPage.tsx': $LoginPage,
+		'./islands/OperatorTable.tsx': $OperatorTable,
 		'./islands/ReservationCalendar.tsx': $ReservationCalendar,
 		'./islands/ResourceList.tsx': $ResourceList,
 		'./islands/UserTable.tsx': $UserTable,

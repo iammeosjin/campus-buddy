@@ -12,7 +12,6 @@ async function handleFileUpload(e: Event, uploadType: string) {
     },
     body: data,
   });
-  console.log('status', response.status);
   if (response.status === 400) {
     alert(await response.text());
     return;

@@ -1,7 +1,23 @@
 // routes/dashboard.tsx
 import { Head } from '$fresh/runtime.ts';
+import { Handlers } from '$fresh/server.ts';
 import Header from '../islands/Header.tsx';
 import DashboardSummary from '../islands/DashboardSummary.tsx';
+import { authorize } from '../middlewares/authorize.ts';
+
+export const handler: Handlers = {
+  GET(req, ctx) {
+    const username = authorize(req);
+    if (!username) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/login' }, // Redirect to home if already logged in
+      });
+    }
+
+    return ctx.render();
+  },
+};
 
 export default function Dashboard() {
   return (

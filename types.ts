@@ -30,13 +30,31 @@ export enum ROUTE {
   USERS = '/users',
 }
 
+export enum ResourceStatus {
+  AVAILABLE = 'AVAILABLE',
+  UNAVAILABLE = 'UNAVAILABLE',
+}
+
 export type Resource = {
   id: ID;
   name: string;
   capacity: number;
   location: string;
-  status: 'Available' | 'Not Available'; // New status field
+  status: ResourceStatus; // New status field
   remarks?: string; // Optional remarks for "Not Available" status
+  creator: ID;
+};
+
+export enum OperatorRole {
+  ADMIN = 'ADMIN',
+  OPERATOR = 'OPERATOR',
+}
+
+export type Operator = {
+  id: ID;
+  username: string;
+  password: string;
+  role: OperatorRole;
 };
 
 export type Reservation = {
@@ -46,8 +64,4 @@ export type Reservation = {
   userName: string;
   date: string;
   time: string;
-};
-
-export type ReservationDoc = Omit<Reservation, 'resource'> & {
-  resource: Resource;
 };
