@@ -6,6 +6,7 @@ import ReservationModel from '../../models/reservation.ts';
 export const handler: Handlers = {
   async POST(req) {
     const newReservation = await req.json();
+    console.log('newReservation', newReservation);
 
     const userId = await authorize(req);
     if (userId) {
