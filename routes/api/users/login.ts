@@ -7,14 +7,13 @@ import key from '../../../library/key.ts';
 export const handler: Handlers = {
   async POST(req) {
     const formData = await req.json();
-
     const user = await UserModel.getUserByEmail(formData.email);
     console.log('user', user, formData);
     if (formData?.password === user?.password) {
       const headers = new Headers();
       const jwt = await create(
         { alg: 'HS256', typ: 'JWT' },
-        { userId: '12345', iss: 'scaleforge', exp: getNumericDate(60 * 60) },
+        { userId: user?.sid, iss: 'cm', exp: getNumericDate(60 * 60) },
         key,
       );
       return new Response(JSON.stringify({ token: jwt }), {

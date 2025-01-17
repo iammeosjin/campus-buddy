@@ -36,7 +36,7 @@ serve(async (req) => {
     }
     const token = authHeader.replace('Bearer ', '');
     try {
-      const payload = await verify(token, key, 'HS256');
+      const payload = await verify(token, key);
       return new Response(JSON.stringify(payload), {
         headers: { 'Content-Type': 'application/json' },
       });

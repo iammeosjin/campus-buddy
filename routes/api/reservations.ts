@@ -1,10 +1,17 @@
 // routes/api/reservations.ts
 import { Handlers } from '$fresh/server.ts';
+import { authorize } from '../../library/authorize.ts';
 import ReservationModel from '../../models/reservation.ts';
 
 export const handler: Handlers = {
   async POST(req) {
     const newReservation = await req.json();
+
+    const userId = await authorize(req);
+    if (userId) {
+      newReservation.user = [userId];
+    }
+
     const guid = crypto.randomUUID();
     const id = [
       ...newReservation.resource,
