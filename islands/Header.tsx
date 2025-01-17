@@ -19,7 +19,7 @@ export default function Header(
   return (
     <header class='header shadow-md'>
       <div class='container mx-auto px-4 py-4 flex justify-between items-center'>
-        <h1 class='header-title'>CampusBuddy Admin</h1>
+        <h1 class='header-title'>CampusReservation Admin</h1>
 
         {/* Menu Toggle Button for Mobile */}
         <button

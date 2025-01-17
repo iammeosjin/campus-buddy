@@ -68,7 +68,7 @@ export default function Resources(
   return (
     <>
       <Head>
-        <title>CampusBuddy Resource Management</title>
+        <title>CampusReservation Resource Management</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'

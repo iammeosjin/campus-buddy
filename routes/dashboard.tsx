@@ -5,7 +5,16 @@ import Header from '../islands/Header.tsx';
 import DashboardSummary from '../islands/DashboardSummary.tsx';
 import { authorize } from '../middlewares/authorize.ts';
 import OperatorModel from '../models/operator.ts';
-import { Operator } from '../types.ts';
+import {
+  Operator,
+  Reservation,
+  Resource,
+  ResourceStatus,
+  User,
+} from '../types.ts';
+import ResourceModel from '../models/resource.ts';
+import UserModel from '../models/user.ts';
+import ReservationModel from '../models/reservation.ts';
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -25,19 +34,35 @@ export const handler: Handlers = {
       });
     }
 
+    const users = await UserModel.list();
+    const resources = await ResourceModel.list();
+    const reservations = await ReservationModel.list();
+
     return ctx.render({
       operator,
+      users,
+      resources: resources.map((res) =>
+        res.status === ResourceStatus.AVAILABLE
+      ),
+      reservations: reservations.filter((res) => res.status === 'PENDING'),
     });
   },
 };
 
 export default function Dashboard(
-  { data }: { data: { operator: Operator } },
+  { data }: {
+    data: {
+      operator: Operator;
+      users: User[];
+      resources: Resource[];
+      reservations: Reservation[];
+    };
+  },
 ) {
   return (
     <>
       <Head>
-        <title>CampusBuddy Admin Dashboard</title>
+        <title>CampusReservation Admin Dashboard</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'
@@ -61,7 +86,7 @@ export default function Dashboard(
         >
           Admin Dashboard
         </h1>
-        <DashboardSummary />
+        <DashboardSummary data={data} />
       </main>
     </>
   );

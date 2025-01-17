@@ -98,7 +98,7 @@ export default function Reservations({ data }: {
   return (
     <>
       <Head>
-        <title>CampusBuddy Reservations</title>
+        <title>CampusReservation Reservations</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'

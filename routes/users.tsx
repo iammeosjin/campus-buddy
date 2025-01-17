@@ -40,7 +40,7 @@ export default function Users(
   return (
     <>
       <Head>
-        <title>CampusBuddy User Management</title>
+        <title>CampusReservation User Management</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'

@@ -54,6 +54,10 @@ export default function UserTable(
   const handleAddUser = async () => {
     const response = await fetch(`/api/users`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-PLATFORM': 'backoffice',
+      },
       body: JSON.stringify({
         sid: user.sid,
         name: user.name?.toLowerCase(),

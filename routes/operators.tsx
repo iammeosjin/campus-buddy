@@ -48,7 +48,7 @@ export default function Users(
   return (
     <>
       <Head>
-        <title>CampusBuddy Operator Management</title>
+        <title>CampusReservation Operator Management</title>
         <link
           href='/css/theme.css'
           rel='stylesheet'

@@ -37,6 +37,11 @@ class Model extends DefaultModel<User> {
     }
   }
 
+  async getUser(sid: string): Promise<User | null> {
+    const res = await this.kv.get<User>([this.getPrefix(), sid]);
+    return res.value;
+  }
+
   async getUserByEmail(email: string): Promise<User | null> {
     const res = await this.kv.get<User>([
       `${this.getPrefix()}_by_email`,
