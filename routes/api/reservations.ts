@@ -11,6 +11,7 @@ export const handler: Handlers = {
     const userId = await authorize(req);
     if (userId) {
       newReservation.user = [userId];
+      newReservation.status = 'PENDING';
     }
 
     const guid = crypto.randomUUID();
@@ -40,6 +41,18 @@ export const handler: Handlers = {
       JSON.stringify(response),
       {
         status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  },
+  async GET() {
+    const reservations = await ReservationModel.list();
+    return new Response(
+      JSON.stringify(
+        reservations.filter((res) => res.status === 'APPROVED'),
+      ),
+      {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       },
     );
