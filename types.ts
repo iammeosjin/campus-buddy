@@ -35,14 +35,23 @@ export enum ResourceStatus {
   UNAVAILABLE = 'UNAVAILABLE',
 }
 
+export enum ResourceType {
+  STUDY_ROOM = 'STUDY_ROOM',
+  LABORATORY = 'LABORATORY',
+  SPORT_FACULTY = 'SPORT_FACULTY',
+  SPORT_EQUIPMENT = 'SPORT_EQUIPMENT',
+}
+
 export type Resource = {
   id: ID;
   name: string;
   capacity: number;
   location: string;
+  type: ResourceType;
   status: ResourceStatus; // New status field
   remarks?: string; // Optional remarks for "Not Available" status
   creator: ID;
+  image: string;
 };
 
 export enum OperatorRole {
@@ -61,7 +70,7 @@ export type Reservation = {
   id: ID;
   resource: ID;
   user: ID;
-  creator: ID;
+  creator?: ID;
   guid: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
   dateStarted: string;
@@ -69,4 +78,5 @@ export type Reservation = {
   dateTimeStarted: string;
   dateTimeEnded: string;
   remarks?: string;
+  dateTimeCreated: string;
 };

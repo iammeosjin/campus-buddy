@@ -11,6 +11,7 @@ import OperatorModel from '../models/operator.ts';
 import UserModel from '../models/user.ts';
 import ReservationModel from '../models/reservation.ts';
 import { Operator, Reservation, Resource, User } from '../types.ts';
+import equals from 'https://deno.land/x/ramda@v0.27.2/source/equals.js';
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -43,19 +44,16 @@ export const handler: Handlers = {
     return ctx.render({
       reservations: await Bluebird.map(
         reservations,
-        async (reservation: Reservation) => {
-          let creator = creatorCache.get(reservation.creator.join(';'));
-          if (!creator) {
-            creator = await OperatorModel.get(reservation.creator);
-            creatorCache.set(reservation.creator.join(';'), creator);
-          }
-          if (!creator) return null;
+        (reservation: Reservation) => {
+          // let creator = creatorCache.get(reservation.creator.join(';'));
+          // if (!creator) {
+          //   creator = await OperatorModel.get(reservation.creator);
+          //   creatorCache.set(reservation.creator.join(';'), creator);
+          // }
 
           let user = userCache.get(reservation.user.join(';'));
           if (!user) {
-            user = users.find((u) =>
-              u.id.join(';') === reservation.user.join(';')
-            ) || null;
+            user = users.find((u) => equals([u.sid], reservation.user)) || null;
             userCache.set(reservation.user.join(';'), user);
           }
           if (!user) return null;
@@ -71,7 +69,7 @@ export const handler: Handlers = {
 
           return {
             ...reservation,
-            creator,
+            resource,
             user,
           };
         },

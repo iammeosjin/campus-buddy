@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 // components/ReservationCalendar.tsx
 import { useState } from 'preact/hooks';
+import equals from 'https://deno.land/x/ramda@v0.27.2/source/equals.js';
 //@deno-types=npm:@types/luxon
 import { DateTime } from 'npm:luxon';
 import { Operator, Reservation, Resource, User } from '../types.ts';
@@ -40,7 +41,7 @@ export default function ReservationCalendar(
       method: 'DELETE',
     });
     if (!response.ok) return;
-    const updatedItems = items.filter((item) => item.guid !== sid);
+    const updatedItems = items.filter((item) => item.id.join(';') !== sid);
     setItems(updatedItems);
   };
 
@@ -50,9 +51,8 @@ export default function ReservationCalendar(
     }
   };
 
-  // Handle new user submission
-  const handleAddUser = async () => {
-    const response = await fetch(`/api/resources`, {
+  const handleAddReservation = async () => {
+    const response = await fetch(`/api/reservations`, {
       method: 'POST',
       body: JSON.stringify(item),
     });
@@ -60,16 +60,22 @@ export default function ReservationCalendar(
     if (!response.ok) return;
 
     const res = await response.json();
-    setItems([...items, res]);
+    setItems([{
+      ...res,
+      user: params.users.find((user) => user.sid === res.user[0]) as User,
+      resource: params.resources.find((resource) =>
+        equals(resource.id, res.resource)
+      ) as Resource,
+    }, ...items]);
     setIsModalOpen(false);
     setItem({
       status: 'APPROVED',
     });
   };
 
-  const handleUpdateUser = async () => {
+  const handleUpdateReservation = async () => {
     if (!item) return;
-    const response = await fetch(`/api/resources/${item.guid}`, {
+    const response = await fetch(`/api/reservations/${item.id?.join(';')}`, {
       method: 'PATCH',
       body: JSON.stringify(item),
     });
@@ -79,13 +85,17 @@ export default function ReservationCalendar(
     setItem({
       status: 'APPROVED',
     });
+    window.location.reload();
   };
 
   // Filtered users based on search term
   const filteredUsers = items.filter(
-    (item) =>
-      item.resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.user.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    (item) => {
+      return item.resource.name.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+      ) ||
+        item.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+    },
   );
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -138,19 +148,10 @@ export default function ReservationCalendar(
           <tbody>
             {list.map((index) => {
               const dateStarted = DateTime.fromISO(index.dateStarted);
-              const dateEnded = DateTime.fromISO(index.dateEnded);
-              const date = dateStarted.toFormat('yyyy-MM-dd') ===
-                  dateEnded.toFormat('yyyy-MM-dd')
-                ? dateStarted.toFormat('yyyy-MM-dd')
-                : `${dateStarted.toFormat('yyyy-MM-dd')} - ${
-                  dateEnded.toFormat('yyyy-MM-dd')
-                }`;
+              const date = dateStarted.toFormat('yyyy-MM-dd');
 
               const dateTimeStarted = DateTime.fromISO(index.dateTimeStarted);
-              const dateTimeEnded = DateTime.fromISO(index.dateTimeEnded);
-              const time = `${dateTimeStarted.toFormat('HH:mm')} - ${
-                dateTimeEnded.toFormat('HH:mm')
-              }`;
+              const time = `${dateTimeStarted.toFormat('HH:mm')}`;
               return (
                 <tr key={index.id.join('-')}>
                   <td>
@@ -180,9 +181,8 @@ export default function ReservationCalendar(
                           setItem({
                             ...index,
                             resource: index.resource.id,
-                            user: index.user.id,
-                            creator: index.creator.id,
-                          });
+                            user: [index.user.sid],
+                          } as any);
                           setIsUpdate(true);
                           setIsModalOpen(true);
                         }}
@@ -245,8 +245,8 @@ export default function ReservationCalendar(
       </div>
 
       {isModalOpen && (
-        <div class='fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50'>
-          <div class='bg-white rounded-lg shadow-lg p-6 w-1/3'>
+        <div class='modal-overlay'>
+          <div class='modal'>
             <h2 class='text-xl font-bold mb-4'>
               {isUpdate ? 'Update Reservation' : 'Create New Reservation'}
             </h2>
@@ -333,8 +333,47 @@ export default function ReservationCalendar(
                   )}
               </div>
               {/* Searchable User Input */}
+              <label>
+                Date:
+                <input
+                  type='date'
+                  class='border border-gray-300 rounded-md p-2 w-full'
+                  value={item.dateStarted || ''}
+                  onInput={(e) =>
+                    setItem({ ...item, dateStarted: e.currentTarget.value })}
+                />
+              </label>
+
+              {/* Time Picker */}
+              <label>
+                Time:
+                <input
+                  type='time'
+                  class='border border-gray-300 rounded-md p-2 w-full'
+                  value={item.dateTimeStarted || ''}
+                  onInput={(e) =>
+                    setItem({
+                      ...item,
+                      dateTimeStarted: e.currentTarget.value,
+                    })}
+                />
+              </label>
 
               {/* Other Inputs */}
+              <select
+                class='border border-gray-300 rounded-md p-2 w-full'
+                value={item.status}
+                onInput={(e) =>
+                  setItem({
+                    ...item,
+                    status: e.currentTarget.value as
+                      | 'APPROVED'
+                      | 'CANCELLED',
+                  })}
+              >
+                <option value={'APPROVED'}>Approved</option>
+                <option value={'CANCELLED'}>Cancelled</option>
+              </select>
               <input
                 type='text'
                 placeholder='Remarks'
@@ -354,7 +393,9 @@ export default function ReservationCalendar(
               </button>
               <button
                 class='button-primary'
-                onClick={isUpdate ? handleUpdateUser : handleAddUser}
+                onClick={isUpdate
+                  ? handleUpdateReservation
+                  : handleAddReservation}
               >
                 {isUpdate ? 'Update' : 'Create'}
               </button>

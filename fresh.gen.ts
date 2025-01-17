@@ -9,6 +9,7 @@ import * as $api_login from './routes/api/login.ts';
 import * as $api_operators from './routes/api/operators.tsx';
 import * as $api_operators_username_ from './routes/api/operators/[username].tsx';
 import * as $api_reservations from './routes/api/reservations.ts';
+import * as $api_reservations_reservation_ from './routes/api/reservations/[reservation].tsx';
 import * as $api_resources from './routes/api/resources.ts';
 import * as $api_resources_resource_ from './routes/api/resources/[resource].ts';
 import * as $api_upload from './routes/api/upload.ts';
@@ -44,6 +45,8 @@ const manifest = {
 		'./routes/api/operators.tsx': $api_operators,
 		'./routes/api/operators/[username].tsx': $api_operators_username_,
 		'./routes/api/reservations.ts': $api_reservations,
+		'./routes/api/reservations/[reservation].tsx':
+			$api_reservations_reservation_,
 		'./routes/api/resources.ts': $api_resources,
 		'./routes/api/resources/[resource].ts': $api_resources_resource_,
 		'./routes/api/upload.ts': $api_upload,

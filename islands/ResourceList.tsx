@@ -1,7 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
 // components/ResourceList.tsx
 import { useState } from 'preact/hooks';
-import { Operator, OperatorRole, Resource, ResourceStatus } from '../types.ts';
+import {
+  Operator,
+  OperatorRole,
+  Resource,
+  ResourceStatus,
+  ResourceType,
+} from '../types.ts';
 import FileUpload from './FileUpload.tsx';
 import { toName } from '../library/to-name.ts';
 
@@ -18,8 +24,12 @@ export default function ResourceList(
   const [currentPage, setCurrentPage] = useState(1);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [resource, setResource] = useState<Partial<Resource>>({
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [resource, setResource] = useState<
+    Partial<Omit<Resource, 'image'> & { image: File }>
+  >({
     status: ResourceStatus.AVAILABLE,
+    type: ResourceType.STUDY_ROOM,
   });
 
   const itemsPerPage = 10;
@@ -39,14 +49,22 @@ export default function ResourceList(
     }
   };
 
-  // Handle new user submission
+  // Handle new resource submission
   const handleAddUser = async () => {
+    const formData = new FormData();
+    formData.append('name', resource.name || '');
+    formData.append('type', resource.type || '');
+    formData.append('capacity', resource.capacity?.toString() || '');
+    formData.append('location', resource.location || '');
+    formData.append('status', resource.status || '');
+    formData.append('remarks', resource.remarks || '');
+    if (resource.image) {
+      formData.append('image', resource.image as any); // Append the image file
+    }
+    formData.append('creator', params.operator.id.join(';'));
     const response = await fetch(`/api/resources`, {
       method: 'POST',
-      body: JSON.stringify({
-        ...resource,
-        creator: params.operator.id,
-      }),
+      body: formData,
     });
 
     if (!response.ok) return;
@@ -54,26 +72,61 @@ export default function ResourceList(
     const res = await response.json();
     setResources([...resources, {
       ...res,
+      image: res.image,
       creator: params.operator,
     }]);
     setIsModalOpen(false);
     setResource({
       status: ResourceStatus.AVAILABLE,
+      type: ResourceType.STUDY_ROOM,
     });
+    setImagePreview(null);
+  };
+
+  const handleImageUpload = (e: Event) => {
+    const fileInput: any = e.target;
+    const fileNameDisplay: any = document.getElementById('file-name');
+
+    if (fileInput.files && fileInput.files[0]) {
+      fileNameDisplay.textContent = fileInput.files[0].name;
+    }
+
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string); // Set the preview URL
+        setResource({ ...resource, image: file }); // Update the resource state with the file
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpdateUser = async () => {
     if (!resource) return;
+    const formData = new FormData();
+    formData.append('name', resource.name || '');
+    formData.append('type', resource.type || '');
+    formData.append('capacity', resource.capacity?.toString() || '');
+    formData.append('location', resource.location || '');
+    formData.append('status', resource.status || '');
+    formData.append('remarks', resource.remarks || '');
+    if (resource.image) {
+      formData.append('image', resource.image as any); // Append the image file
+    }
     const response = await fetch(`/api/resources/${resource.id?.join(';')}`, {
       method: 'PATCH',
-      body: JSON.stringify(resource),
+      body: formData,
     });
     if (!response.ok) return;
     setIsUpdate(false);
     setIsModalOpen(false);
     setResource({
       status: ResourceStatus.AVAILABLE,
+      type: ResourceType.STUDY_ROOM,
     });
+    setImagePreview(null);
+    window.location.reload();
   };
 
   // Filtered users based on search term
@@ -126,6 +179,7 @@ export default function ResourceList(
           <thead>
             <tr>
               <th>Name</th>
+              <th>Type</th>
               <th>Capacity</th>
               <th>Location</th>
               <th>Status</th>
@@ -142,6 +196,7 @@ export default function ResourceList(
                 <td>
                   <b>{toName(index.name)}</b>
                 </td>
+                <td>{toName(index.type)}</td>
                 <td>{index.capacity}</td>
                 <td>{index.location}</td>
                 <td>
@@ -165,7 +220,8 @@ export default function ResourceList(
                         setResource({
                           ...index,
                           creator: index.creator.id,
-                        });
+                        } as any);
+                        setImagePreview(index.image);
                         setIsUpdate(true);
                         setIsModalOpen(true);
                       }}
@@ -226,23 +282,57 @@ export default function ResourceList(
         </div>
       </div>
 
-      {
-        /* Modal */
-        /*
-      id: ['2'],
-      name: 'Lab Room B',
-      capacity: 15,
-      location: 'Building B',
-      status: ResourceStatus.UNAVAILABLE,
-      remarks: 'Under Maintenance',
-      creator: ['1'],
-      */
-      }
       {isModalOpen && (
-        <div class='fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50'>
-          <div class='bg-white rounded-lg shadow-lg p-6 w-1/3'>
-            <h2 class='text-xl font-bold mb-4'>Create New User</h2>
+        <div class='modal-overlay'>
+          <div class='modal'>
+            <h2 class='text-xl font-bold mb-4'>
+              {isUpdate ? 'Update Resource' : 'Create New Resource'}
+            </h2>
             <div class='space-y-4'>
+              {/* Image Upload */}
+              <div class='file-input-container'>
+                <label for='file-upload' class='file-upload-label'>
+                  Choose File
+                </label>
+                <input
+                  id='file-upload'
+                  type='file'
+                  accept='image/*'
+                  class='file-upload-input'
+                  onChange={(event) => handleImageUpload(event)}
+                />
+                <span id='file-name' class='file-name'>No file chosen</span>
+              </div>
+              {/* Image Preview */}
+              {imagePreview && (
+                <div class='flex items-center justify-center'>
+                  <img
+                    src={imagePreview.includes('data:image')
+                      ? imagePreview
+                      : `https://gateway.pinata.cloud/ipfs/${imagePreview}`}
+                    alt='Preview'
+                    class='h-32 w-32 object-cover rounded-md'
+                  />
+                </div>
+              )}
+              <select
+                class='border border-gray-300 rounded-md p-2 w-full'
+                value={resource.type}
+                onInput={(e) =>
+                  setResource({
+                    ...resource,
+                    type: e.currentTarget.value as ResourceType,
+                  })}
+              >
+                <option value={ResourceType.STUDY_ROOM}>Study Room</option>
+                <option value={ResourceType.LABORATORY}>Laboratory</option>
+                <option value={ResourceType.SPORT_EQUIPMENT}>
+                  Sport Equipment
+                </option>
+                <option value={ResourceType.SPORT_FACULTY}>
+                  Sport Faculty
+                </option>
+              </select>
               <input
                 type='text'
                 placeholder='Name'
@@ -304,6 +394,7 @@ export default function ResourceList(
                   if (isUpdate) {
                     setResource({});
                   }
+                  setImagePreview(null);
                   setIsModalOpen(false);
                 }}
               >
