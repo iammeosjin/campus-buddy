@@ -24,6 +24,15 @@ export const handler: Handlers = {
           status: 401,
         });
       }
+
+      await UserModel.updateUser([existingUser.sid], {
+        status: UserStatus.ACTIVE,
+      });
+
+      return new Response(null, {
+        status: 201, // See Other
+        headers: new Headers(),
+      });
     }
 
     await UserModel.insertUser(user);
