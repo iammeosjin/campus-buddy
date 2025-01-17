@@ -218,8 +218,8 @@ export default function UserTable(
 
       {/* Modal */}
       {isModalOpen && (
-        <div class='fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50'>
-          <div class='bg-white rounded-lg shadow-lg p-6 w-1/3'>
+        <div class='modal-overlay'>
+          <div class='modal'>
             <h2 class='text-xl font-bold mb-4'>
               {isUpdate ? 'Update' : 'Create New'} User
             </h2>
