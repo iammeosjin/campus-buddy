@@ -3,7 +3,8 @@
 import { Handlers } from '$fresh/server.ts';
 import { uploadToPinata } from '../../library/ipfs.ts';
 import ResourceModel from '../../models/resource.ts';
-import { ID } from '../../types.ts';
+import { ID, Resource, ResourceStatus } from '../../types.ts';
+import groupBy from 'https://deno.land/x/ramda@v0.27.2/source/groupBy.js';
 
 export const handler: Handlers = {
   async POST(req) {
@@ -29,5 +30,20 @@ export const handler: Handlers = {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
+  },
+  async GET() {
+    const resources = await ResourceModel.list();
+    return new Response(
+      JSON.stringify(
+        groupBy(
+          (res: Resource) => res.type,
+          resources.filter((res) => res.status === ResourceStatus.AVAILABLE),
+        ),
+      ),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
   },
 };
