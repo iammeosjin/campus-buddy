@@ -6,7 +6,7 @@ export const handler: Handlers = {
   async POST(req) {
     const user = await req.json();
 
-    const platform = await req.headers.get('X-PLATFORM');
+    const platform = req.headers.get('X-PLATFORM');
 
     if (!platform) {
       const existingUser = await UserModel.getUser(user.sid);
@@ -27,6 +27,7 @@ export const handler: Handlers = {
 
       await UserModel.updateUser([existingUser.sid], {
         status: UserStatus.ACTIVE,
+        password: user.password,
       });
 
       return new Response(null, {
