@@ -4,7 +4,7 @@ import { useState } from 'preact/hooks';
 import equals from 'https://deno.land/x/ramda@v0.27.2/source/equals.js';
 //@deno-types=npm:@types/luxon
 import { DateTime } from 'npm:luxon';
-import { Operator, Reservation, Resource, User } from '../types.ts';
+import { ID, Operator, Reservation, Resource, User } from '../types.ts';
 import { toName } from '../library/to-name.ts';
 
 type ReservationDoc = Omit<Reservation, 'resource' | 'user' | 'creator'> & {
@@ -253,17 +253,32 @@ export default function ReservationCalendar(
             <div class='space-y-4'>
               {/* Searchable Resource Input */}
               <div class='relative'>
-                <input
-                  type='text'
-                  placeholder='Search Resource...'
-                  class='border border-gray-300 rounded-md p-2 w-full'
-                  value={resourceSearch || ''}
-                  onInput={(e) => setResourceSearch(e.currentTarget.value)}
-                  onFocus={() => {
-                    setIsResourceDropdownOpen(true);
-                    setIsUserDropdownOpen(false);
-                  }}
-                />
+                {isUpdate
+                  ? (
+                    <input
+                      type='text'
+                      placeholder='Remarks'
+                      class='border border-gray-300 rounded-md p-2 w-full'
+                      value={params.resources.find((res) =>
+                        equals(res.id, item.resource as ID)
+                      )?.name || ''}
+                      disabled
+                    />
+                  )
+                  : (
+                    <input
+                      type='text'
+                      placeholder='Search Resource...'
+                      class='border border-gray-300 rounded-md p-2 w-full'
+                      value={resourceSearch || ''}
+                      onInput={(e) => setResourceSearch(e.currentTarget.value)}
+                      onFocus={() => {
+                        setIsResourceDropdownOpen(true);
+                        setIsUserDropdownOpen(false);
+                      }}
+                    />
+                  )}
+
                 {isResourceDropdownOpen && (
                   <div class='absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto z-10'>
                     {params.resources
@@ -293,17 +308,32 @@ export default function ReservationCalendar(
               </div>
 
               <div class='relative'>
-                <input
-                  type='text'
-                  placeholder='Search User...'
-                  class='border border-gray-300 rounded-md p-2 w-full'
-                  value={userSearch || ''}
-                  onInput={(e) => setUserSearch(e.currentTarget.value)}
-                  onFocus={() => {
-                    setIsUserDropdownOpen(true);
-                    setIsResourceDropdownOpen(false);
-                  }}
-                />
+                {isUpdate
+                  ? (
+                    <input
+                      type='text'
+                      placeholder='Remarks'
+                      class='border border-gray-300 rounded-md p-2 w-full'
+                      value={params.users.find((res) =>
+                        equals([res.sid], item.user as ID)
+                      )?.name || ''}
+                      disabled
+                    />
+                  )
+                  : (
+                    <input
+                      type='text'
+                      placeholder='Search User...'
+                      class='border border-gray-300 rounded-md p-2 w-full'
+                      value={userSearch || ''}
+                      onInput={(e) => setUserSearch(e.currentTarget.value)}
+                      onFocus={() => {
+                        setIsUserDropdownOpen(true);
+                        setIsResourceDropdownOpen(false);
+                      }}
+                    />
+                  )}
+
                 {isUserDropdownOpen &&
                   (
                     <div class='absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto z-10'>
