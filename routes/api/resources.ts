@@ -31,8 +31,21 @@ export const handler: Handlers = {
       headers: { 'Content-Type': 'application/json' },
     });
   },
-  async GET() {
+  async GET(req) {
+    const type = req.headers.get('X-TYPE');
+
     const resources = await ResourceModel.list();
+    if (type === 'all') {
+      return new Response(
+        JSON.stringify(
+          resources,
+        ),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
     return new Response(
       JSON.stringify(
         groupBy(
