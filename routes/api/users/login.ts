@@ -1,6 +1,6 @@
 // routes/api/login.ts
 import { Handlers } from '$fresh/server.ts';
-import { create, getNumericDate } from 'https://deno.land/x/djwt@v2.8/mod.ts';
+import { create } from 'https://deno.land/x/djwt@v2.8/mod.ts';
 import UserModel from '../../../models/user.ts';
 import key from '../../../library/key.ts';
 
@@ -13,7 +13,7 @@ export const handler: Handlers = {
       const headers = new Headers();
       const jwt = await create(
         { alg: 'HS256', typ: 'JWT' },
-        { userId: user?.sid, iss: 'cm', exp: getNumericDate(60 * 60) },
+        { userId: user?.sid, iss: 'cm' },
         key,
       );
       return new Response(JSON.stringify({ token: jwt }), {
