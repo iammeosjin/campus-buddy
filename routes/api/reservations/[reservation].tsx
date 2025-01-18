@@ -8,6 +8,8 @@ export const handler: Handlers = {
     const operator = await ReservationModel.get(
       ctx.params.reservation.split(';'),
     );
+    console.log('operator', operator);
+    console.log('body', body);
     await ReservationModel.insert({
       ...operator,
       ...omit(['id', 'guid', 'dateTimeCreated'], body),
