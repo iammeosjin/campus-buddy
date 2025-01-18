@@ -1,5 +1,6 @@
 import { Handlers } from '$fresh/server.ts';
 import ReservationModel from '../../../models/reservation.ts';
+import omit from 'https://deno.land/x/ramda@v0.27.2/source/omit.js';
 
 export const handler: Handlers = {
   async PATCH(req, ctx) {
@@ -9,7 +10,7 @@ export const handler: Handlers = {
     );
     await ReservationModel.insert({
       ...operator,
-      ...body,
+      ...omit(['id', 'guid', 'dateTimeCreated'], body),
     });
     const headers = new Headers();
     return new Response(null, {
