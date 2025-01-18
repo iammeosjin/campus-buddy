@@ -1,4 +1,5 @@
 import { Handlers } from '$fresh/server.ts';
+import { authorize } from '../../library/authorize.ts';
 import UserModel from '../../models/user.ts';
 import { UserStatus } from '../../types.ts';
 
@@ -42,5 +43,28 @@ export const handler: Handlers = {
       status: 201, // See Other
       headers,
     });
+  },
+  async GET(req) {
+    const userId = await authorize(req);
+    if (!userId) {
+      return new Response(
+        'User not authorized',
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+
+    const user = await UserModel.getUser(userId);
+    return new Response(
+      JSON.stringify(
+        user,
+      ),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
   },
 };

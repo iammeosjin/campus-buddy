@@ -45,11 +45,17 @@ export const handler: Handlers = {
       },
     );
   },
-  async GET() {
+  async GET(_, ctx) {
+    const user = ctx.url.searchParams.get('user');
     const reservations = await ReservationModel.list();
     return new Response(
       JSON.stringify(
-        reservations.filter((res) => res.status === 'APPROVED'),
+        reservations.filter((res) => {
+          if (user) {
+            return res.user.join(';') === user && res.status === 'APPROVED';
+          }
+          return res.status === 'APPROVED';
+        }),
       ),
       {
         status: 200,
