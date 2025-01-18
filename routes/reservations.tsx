@@ -67,8 +67,14 @@ export const handler: Handlers = {
           }
           if (!resource) return null;
 
+          let status = reservation.status;
+          if (new Date(reservation.dateStarted) < new Date()) {
+            status = 'EXPIRED';
+          }
+
           return {
             ...reservation,
+            status,
             resource,
             user,
           };

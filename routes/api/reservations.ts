@@ -50,12 +50,17 @@ export const handler: Handlers = {
     const reservations = await ReservationModel.list();
     return new Response(
       JSON.stringify(
-        reservations.filter((res) => {
-          if (user) {
-            return res.user.join(';') === user && res.status === 'APPROVED';
-          }
-          return res.status === 'APPROVED';
-        }),
+        reservations.map((res) =>
+          new Date(res.dateStarted) < new Date()
+            ? { ...res, status: 'EXPIRED' }
+            : res
+        )
+          .filter((res) => {
+            if (user) {
+              return res.user.join(';') === user && res.status === 'APPROVED';
+            }
+            return res.status === 'APPROVED';
+          }),
       ),
       {
         status: 200,

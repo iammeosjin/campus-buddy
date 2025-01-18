@@ -72,7 +72,7 @@ export type Reservation = {
   user: ID;
   creator?: ID;
   guid: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
   dateStarted: string;
   dateEnded: string;
   dateTimeStarted: string;
