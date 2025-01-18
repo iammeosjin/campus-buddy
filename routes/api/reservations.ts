@@ -45,8 +45,12 @@ export const handler: Handlers = {
       },
     );
   },
-  async GET(_, ctx) {
-    const user = ctx.url.searchParams.get('user');
+  async GET(req) {
+    const platform = req.headers.get('X-PLATFORM');
+    let user: undefined | string | null;
+    if (platform === 'mobile') {
+      user = await authorize(req);
+    }
     const reservations = await ReservationModel.list();
     return new Response(
       JSON.stringify(
