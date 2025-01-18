@@ -152,6 +152,8 @@ h1, h2, h3 {
   }
 }
 
+.no-cursor { cursor:not-allowed; }
+
 /* File Input Container */
 .file-input-container {
   display: flex;

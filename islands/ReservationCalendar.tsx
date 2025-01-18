@@ -177,7 +177,9 @@ export default function ReservationCalendar(
                       </button>
                       <button
                         disabled={index.status === 'EXPIRED'}
-                        class='button-primary'
+                        class={index.status === 'EXPIRED'
+                          ? 'button-primary no-cursor'
+                          : 'button-primary'}
                         onClick={() => {
                           setItem({
                             ...index,
