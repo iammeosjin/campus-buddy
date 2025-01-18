@@ -23,15 +23,6 @@ export const handler: Handlers = {
         });
       }
 
-      if (existingUser.name !== user.name) {
-        return new Response(
-          'Name is not in the same in record with school id.',
-          {
-            status: 401,
-          },
-        );
-      }
-
       if (
         existingUser.status === UserStatus.ACTIVE ||
         existingUser.status === UserStatus.SUSPENDED
