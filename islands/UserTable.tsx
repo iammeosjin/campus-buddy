@@ -13,7 +13,7 @@ export default function UserTable(
 	const [currentPage, setCurrentPage] = useState(1);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [user, setUser] = useState<Partial<User>>({
-		status: UserStatus.ACTIVE,
+		status: UserStatus.INACTIVE,
 		role: UserRole.STUDENT,
 	});
 	const [isUpdate, setIsUpdate] = useState(false);

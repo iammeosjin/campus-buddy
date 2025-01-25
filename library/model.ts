@@ -31,6 +31,8 @@ export default class DefaultModel<T> {
 		if (params?.prefix) {
 			filter.prefix.push(...params.prefix);
 		}
+
+		console.log('filter', filter);
 		const entries: (KVEntry & T)[] = [];
 		for await (
 			const entry of KV.list<KVEntry & T>(filter, params?.options)
