@@ -1,16 +1,6 @@
 // components/DashboardSummary.tsx
-import { useEffect, useState } from 'preact/hooks';
-import { Reservation, Resource, User } from '../types.ts';
 
-// Mock API call function
-const fetchStats = () => {
-  // Replace with actual API call logic
-  return Promise.resolve({
-    users: 120,
-    resources: 15,
-    pendingReservations: 5,
-  });
-};
+import { Reservation, Resource, User } from '../types.ts';
 
 export default function DashboardSummary(params: {
   data: {

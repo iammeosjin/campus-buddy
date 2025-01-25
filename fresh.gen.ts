@@ -6,6 +6,7 @@ import * as $_404 from './routes/_404.tsx';
 import * as $_app from './routes/_app.tsx';
 import * as $api_joke from './routes/api/joke.ts';
 import * as $api_login from './routes/api/login.ts';
+import * as $api_notifications from './routes/api/notifications.ts';
 import * as $api_operators from './routes/api/operators.tsx';
 import * as $api_operators_username_ from './routes/api/operators/[username].tsx';
 import * as $api_reservations from './routes/api/reservations.ts';
@@ -43,6 +44,7 @@ const manifest = {
 		'./routes/_app.tsx': $_app,
 		'./routes/api/joke.ts': $api_joke,
 		'./routes/api/login.ts': $api_login,
+		'./routes/api/notifications.ts': $api_notifications,
 		'./routes/api/operators.tsx': $api_operators,
 		'./routes/api/operators/[username].tsx': $api_operators_username_,
 		'./routes/api/reservations.ts': $api_reservations,
