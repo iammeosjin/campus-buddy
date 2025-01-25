@@ -41,6 +41,26 @@ class Model extends DefaultModel<User> {
 		}
 	}
 
+	async updateUserByEmail(email: string, update: Partial<Omit<User, 'id'>>) {
+		const getRes = await this.kv.get<User>([
+			`${this.getPrefix()}_by_email`,
+			email,
+		]);
+		if (getRes.value === null) return;
+		const user = mergeDeepRight(getRes.value, update);
+		const primaryKey = [this.getPrefix(), user.sid];
+		const byEmailKey = [`${this.getPrefix()}_by_email`, user.email];
+		const res = await this.kv.atomic()
+			.set(primaryKey, user)
+			.set(byEmailKey, user)
+			.commit();
+		if (!res.ok) {
+			throw new ResourceAlreadyExists(
+				'User with ID or email already exists',
+			);
+		}
+	}
+
 	async getUser(sid: string): Promise<User | null> {
 		const res = await this.kv.get<User>([this.getPrefix(), sid]);
 		return res.value;

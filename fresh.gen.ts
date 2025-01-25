@@ -18,6 +18,7 @@ import * as $api_users from './routes/api/users.ts';
 import * as $api_users_user_ from './routes/api/users/[user].ts';
 import * as $api_users_forgot_password from './routes/api/users/forgot-password.ts';
 import * as $api_users_login from './routes/api/users/login.ts';
+import * as $api_users_update_password from './routes/api/users/update-password.ts';
 import * as $api_users_verify_code from './routes/api/users/verify-code.ts';
 import * as $dashboard from './routes/dashboard.tsx';
 import * as $greet_name_ from './routes/greet/[name].tsx';
@@ -59,6 +60,7 @@ const manifest = {
 		'./routes/api/users/[user].ts': $api_users_user_,
 		'./routes/api/users/forgot-password.ts': $api_users_forgot_password,
 		'./routes/api/users/login.ts': $api_users_login,
+		'./routes/api/users/update-password.ts': $api_users_update_password,
 		'./routes/api/users/verify-code.ts': $api_users_verify_code,
 		'./routes/dashboard.tsx': $dashboard,
 		'./routes/greet/[name].tsx': $greet_name_,
