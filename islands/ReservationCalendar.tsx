@@ -94,10 +94,10 @@ export default function ReservationCalendar(
 	// Filtered users based on search term
 	const filteredItems = items.filter(
 		(item) => {
-			return (item.resource && item.resource.name.toLowerCase().includes(
+			return (!item.resource || item.resource.name.toLowerCase().includes(
 				searchTerm.toLowerCase(),
 			)) ||
-				(item.user &&
+				(!item.user ||
 					item.user.name.toLowerCase().includes(
 						searchTerm.toLowerCase(),
 					));
