@@ -66,6 +66,12 @@ export type Operator = {
 	role: OperatorRole;
 };
 
+export type OTP = {
+	id: ID;
+	email: string;
+	code: string;
+};
+
 export type Notification = {
 	id: ID;
 	recepient: ID;

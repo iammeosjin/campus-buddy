@@ -16,6 +16,7 @@ import * as $api_resources_resource_ from './routes/api/resources/[resource].ts'
 import * as $api_upload from './routes/api/upload.ts';
 import * as $api_users from './routes/api/users.ts';
 import * as $api_users_user_ from './routes/api/users/[user].ts';
+import * as $api_users_forgot_password from './routes/api/users/forgot-password.ts';
 import * as $api_users_login from './routes/api/users/login.ts';
 import * as $dashboard from './routes/dashboard.tsx';
 import * as $greet_name_ from './routes/greet/[name].tsx';
@@ -55,6 +56,7 @@ const manifest = {
 		'./routes/api/upload.ts': $api_upload,
 		'./routes/api/users.ts': $api_users,
 		'./routes/api/users/[user].ts': $api_users_user_,
+		'./routes/api/users/forgot-password.ts': $api_users_forgot_password,
 		'./routes/api/users/login.ts': $api_users_login,
 		'./routes/dashboard.tsx': $dashboard,
 		'./routes/greet/[name].tsx': $greet_name_,
