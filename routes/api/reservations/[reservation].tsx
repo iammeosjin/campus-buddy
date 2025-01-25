@@ -61,7 +61,7 @@ export const handler: Handlers = {
 					reservation: reservation!.id,
 					title: `${toName(resource!.name)} cancelled`,
 					body: `${
-						3 - (reservations.length + 1)
+						3 - (reservations.length)
 					} more cancellations and your account will be suspended`,
 					image: resource!.image,
 					location: resource!.location,
