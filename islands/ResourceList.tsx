@@ -361,8 +361,8 @@ export default function ResourceList(
 								<option value={ResourceType.SPORT_EQUIPMENT}>
 									Sport Equipment
 								</option>
-								<option value={ResourceType.SPORT_FACULTY}>
-									Sport Faculty
+								<option value={ResourceType.SPORT_FACILITY}>
+									Sport Facility
 								</option>
 								<option value={ResourceType.OTHERS}>
 									Others
