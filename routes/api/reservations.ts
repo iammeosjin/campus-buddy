@@ -96,6 +96,7 @@ export const handler: Handlers = {
 	async GET(req) {
 		const platform = req.headers.get('X-PLATFORM');
 		let user: undefined | string | null;
+		console.log('platform', platform);
 		if (platform === 'mobile') {
 			user = await authorize(req);
 		}
