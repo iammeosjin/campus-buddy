@@ -40,6 +40,7 @@ export enum ResourceType {
 	LABORATORY = 'LABORATORY',
 	SPORT_FACULTY = 'SPORT_FACULTY',
 	SPORT_EQUIPMENT = 'SPORT_EQUIPMENT',
+	OTHERS = 'OTHERS',
 }
 
 export type Resource = {
