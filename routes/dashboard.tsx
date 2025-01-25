@@ -38,13 +38,17 @@ export const handler: Handlers = {
 		const resources = await ResourceModel.list();
 		const reservations = await ReservationModel.list();
 
+		console.log('reservations', reservations);
+
 		return ctx.render({
 			operator,
 			users,
 			resources: resources.map((res) =>
 				res.status === ResourceStatus.AVAILABLE
 			),
-			reservations: reservations,
+			reservations: reservations.filter((res) =>
+				res.status === 'PENDING'
+			),
 		});
 	},
 };
