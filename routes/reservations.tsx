@@ -40,53 +40,55 @@ export const handler: Handlers = {
 
 		const userCache = new Map<string, User | null>();
 		const resourceCache = new Map<string, Resource | null>();
+		const res = await Bluebird.map(
+			reservations,
+			(reservation: Reservation) => {
+				// let creator = creatorCache.get(reservation.creator.join(';'));
+				// if (!creator) {
+				//   creator = await OperatorModel.get(reservation.creator);
+				//   creatorCache.set(reservation.creator.join(';'), creator);
+				// }
 
-		return ctx.render({
-			reservations: await Bluebird.map(
-				reservations,
-				(reservation: Reservation) => {
-					// let creator = creatorCache.get(reservation.creator.join(';'));
-					// if (!creator) {
-					//   creator = await OperatorModel.get(reservation.creator);
-					//   creatorCache.set(reservation.creator.join(';'), creator);
-					// }
+				let user = userCache.get(reservation.user.join(';'));
+				if (!user) {
+					user = users.find((u) =>
+						equals([u.sid], reservation.user)
+					) || null;
+					userCache.set(reservation.user.join(';'), user);
+				}
 
-					let user = userCache.get(reservation.user.join(';'));
-					if (!user) {
-						user = users.find((u) =>
-							equals([u.sid], reservation.user)
-						) || null;
-						userCache.set(reservation.user.join(';'), user);
-					}
-
-					let resource = resourceCache.get(
+				let resource = resourceCache.get(
+					reservation.resource.join(';'),
+				);
+				if (!resource) {
+					resource = resources.find((u) =>
+						u.id.join(';') === reservation.resource.join(';')
+					) || null;
+					resourceCache.set(
 						reservation.resource.join(';'),
-					);
-					if (!resource) {
-						resource = resources.find((u) =>
-							u.id.join(';') === reservation.resource.join(';')
-						) || null;
-						resourceCache.set(
-							reservation.resource.join(';'),
-							resource,
-						);
-					}
-
-					let status = reservation.status;
-					if (new Date(reservation.dateStarted) < new Date()) {
-						status = 'EXPIRED';
-					}
-
-					return {
-						...reservation,
-						status,
 						resource,
-						user,
-					};
-				},
-			).then((reservations: any) =>
-				reservations.filter((reservation: any) => !!reservation)
-			),
+					);
+				}
+
+				let status = reservation.status;
+				if (new Date(reservation.dateStarted) < new Date()) {
+					status = 'EXPIRED';
+				}
+
+				return {
+					...reservation,
+					status,
+					resource,
+					user,
+				};
+			},
+		).then((reservations: any) =>
+			reservations.filter((reservation: any) => !!reservation)
+		);
+
+		console.log('res', res);
+		return ctx.render({
+			reservations: res,
 			operator,
 			resources,
 			users,

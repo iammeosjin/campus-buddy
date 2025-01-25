@@ -104,6 +104,8 @@ export default function ReservationCalendar(
 		},
 	);
 
+	console.log('filteredItems', filteredItems);
+
 	const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
 	const list = filteredItems.slice(
