@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-// components/ReservationCalendar.tsx
+// components/ReservationPage.tsx
 import { useState } from 'preact/hooks';
 import equals from 'https://deno.land/x/ramda@v0.27.2/source/equals.js';
 //@deno-types=npm:@types/luxon
@@ -13,7 +13,7 @@ type ReservationDoc = Omit<Reservation, 'resource' | 'user' | 'creator'> & {
 	creator: Operator;
 };
 
-export default function ReservationCalendar(
+export default function ReservationPage(
 	params: {
 		reservations: ReservationDoc[];
 		operator: Operator;
@@ -443,8 +443,13 @@ export default function ReservationCalendar(
 								Time:
 								<input
 									type='time'
+									step='3600'
+									pattern='^([01][0-9]|2[0-3]):00$'
 									class='border border-gray-300 rounded-md p-2 w-full'
-									value={item.dateTimeStarted || ''}
+									value={item.dateTimeStarted ||
+										DateTime.now().startOf('hour').toFormat(
+											'hh:mm',
+										)}
 									onInput={(e) =>
 										setItem({
 											...item,

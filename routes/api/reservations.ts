@@ -15,7 +15,6 @@ export const handler: Handlers = {
 	async POST(req) {
 		const newReservation = await req.json();
 		console.log('newReservation', newReservation);
-
 		const resource = await ResourceModel.get(newReservation.resource);
 
 		if (!resource) {

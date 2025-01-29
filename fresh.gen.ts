@@ -36,8 +36,9 @@ import * as $FileUpload from './islands/FileUpload.tsx';
 import * as $Header from './islands/Header.tsx';
 import * as $LoginPage from './islands/LoginPage.tsx';
 import * as $OperatorTable from './islands/OperatorTable.tsx';
-import * as $ReservationCalendar from './islands/ReservationCalendar.tsx';
-import * as $ResourceList from './islands/ResourceList.tsx';
+import * as $ReservationPage from './islands/ReservationPage.tsx';
+import * as $ResourcePage from './islands/ResourcePage.tsx';
+import * as $ResourceTable from './islands/ResourceTable.tsx';
 import * as $UserTable from './islands/UserTable.tsx';
 import type { Manifest } from '$fresh/server.ts';
 
@@ -80,8 +81,9 @@ const manifest = {
 		'./islands/Header.tsx': $Header,
 		'./islands/LoginPage.tsx': $LoginPage,
 		'./islands/OperatorTable.tsx': $OperatorTable,
-		'./islands/ReservationCalendar.tsx': $ReservationCalendar,
-		'./islands/ResourceList.tsx': $ResourceList,
+		'./islands/ReservationPage.tsx': $ReservationPage,
+		'./islands/ResourcePage.tsx': $ResourcePage,
+		'./islands/ResourceTable.tsx': $ResourceTable,
 		'./islands/UserTable.tsx': $UserTable,
 	},
 	baseUrl: import.meta.url,

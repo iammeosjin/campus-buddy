@@ -4,13 +4,12 @@ import { Handlers } from '$fresh/server.ts';
 import { Head } from '$fresh/runtime.ts';
 import Header from '../islands/Header.tsx';
 import Bluebird from 'npm:bluebird';
-import ResourceList from '../islands/ResourceList.tsx';
 import ResourceModel from '../models/resource.ts';
 import { Operator, OperatorRole, Reservation, Resource } from '../types.ts';
 import OperatorModel from '../models/operator.ts';
 import { authorize } from '../middlewares/authorize.ts';
 import ReservationModel from '../models/reservation.ts';
-import Calendar from '../islands/Calendar.tsx';
+import ResourcePage from '../islands/ResourcePage.tsx';
 
 export const handler: Handlers = {
 	async GET(req, ctx) {
@@ -111,15 +110,13 @@ export default function Resources(
 			<Header activePage='/resources' operator={data.operator} />
 			<div class='p-4'>
 				<h1 class='text-3xl font-bold mb-6'>Manage Resources</h1>
-				<Calendar
+
+				<ResourcePage
+					resources={data.resources}
+					operator={data.operator}
 					reservations={data.reservations}
 					initialMonth={data.month}
 					initialYear={data.year}
-					resources={data.resources}
-				/>
-				<ResourceList
-					resources={data.resources}
-					operator={data.operator}
 				/>
 			</div>
 		</>

@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-// components/ResourceList.tsx
+// components/ResourcePage.tsx
 import { useState } from 'preact/hooks';
 import {
 	Operator,
@@ -8,21 +8,20 @@ import {
 	ResourceStatus,
 	ResourceType,
 } from '../types.ts';
-import FileUpload from './FileUpload.tsx';
+
 import { toName } from '../library/to-name.ts';
 
-export default function ResourceList(
+export default function ResourceTable(
 	params: {
 		resources: (Omit<Resource, 'creator'> & { creator: Operator })[];
 		operator: Operator;
+		searchTerm: string;
 	},
 ) {
 	const [resources, setResources] = useState<
 		(Omit<Resource, 'creator'> & { creator: Operator })[]
 	>(params.resources);
-	const [searchTerm, setSearchTerm] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
-	const [isUpdate, setIsUpdate] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
 	const [resource, setResource] = useState<
@@ -51,40 +50,6 @@ export default function ResourceList(
 		}
 	};
 
-	// Handle new resource submission
-	const handleAddUser = async () => {
-		const formData = new FormData();
-		formData.append('name', resource.name || '');
-		formData.append('type', resource.type || '');
-		formData.append('capacity', resource.capacity?.toString() || '');
-		formData.append('location', resource.location || '');
-		formData.append('status', resource.status || '');
-		formData.append('remarks', resource.remarks || '');
-		if (resource.image) {
-			formData.append('image', resource.image as any); // Append the image file
-		}
-		formData.append('creator', params.operator.id.join(';'));
-		const response = await fetch(`/api/resources`, {
-			method: 'POST',
-			body: formData,
-		});
-
-		if (!response.ok) return;
-
-		const res = await response.json();
-		setResources([...resources, {
-			...res,
-			image: res.image,
-			creator: params.operator,
-		}]);
-		setIsModalOpen(false);
-		setResource({
-			status: ResourceStatus.AVAILABLE,
-			type: ResourceType.STUDY_ROOM,
-		});
-		setImagePreview(null);
-	};
-
 	const handleImageUpload = (e: Event) => {
 		const fileInput: any = e.target;
 		const fileNameDisplay: any = document.getElementById('file-name');
@@ -104,7 +69,7 @@ export default function ResourceList(
 		}
 	};
 
-	const handleUpdateUser = async () => {
+	const handleUpdateResource = async () => {
 		if (!resource) return;
 		const formData = new FormData();
 		formData.append('name', resource.name || '');
@@ -124,7 +89,6 @@ export default function ResourceList(
 			},
 		);
 		if (!response.ok) return;
-		setIsUpdate(false);
 		setIsModalOpen(false);
 		setResource({
 			status: ResourceStatus.AVAILABLE,
@@ -137,15 +101,17 @@ export default function ResourceList(
 	// Filtered users based on search term
 	const filteredUsers = resources.filter(
 		(resource) =>
-			resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+			resource.name.toLowerCase().includes(
+				params.searchTerm.toLowerCase(),
+			) ||
 			resource.location.toLowerCase().includes(
-				searchTerm.toLowerCase(),
+				params.searchTerm.toLowerCase(),
 			) ||
 			resource.remarks?.toLowerCase().includes(
-				searchTerm.toLowerCase(),
+				params.searchTerm.toLowerCase(),
 			) ||
 			resource.creator.username.toLowerCase().includes(
-				searchTerm.toLowerCase(),
+				params.searchTerm.toLowerCase(),
 			),
 	);
 
@@ -160,35 +126,6 @@ export default function ResourceList(
 		<>
 			<section>
 				<div class='container mx-auto px-4'>
-					{/* Search and Upload Section */}
-					<div class='flex justify-between items-center mb-4'>
-						<input
-							type='text'
-							placeholder='Search...'
-							class='border border-gray-300 rounded-md p-2 w-1/2'
-							value={searchTerm}
-							onInput={(e) =>
-								setSearchTerm(
-									((e.target as any)?.value || '') as string,
-								)}
-						/>
-						<div class='flex space-x-2'>
-							<FileUpload
-								uploadType='resources'
-								operator={params.operator}
-							/>
-							<button
-								class='button-primary'
-								onClick={() => {
-									setIsUpdate(false);
-									setIsModalOpen(true);
-								}}
-							>
-								Create Resource
-							</button>
-						</div>
-					</div>
-
 					{/* Table */}
 					<table class='table'>
 						<thead>
@@ -243,7 +180,6 @@ export default function ResourceList(
 													setImagePreview(
 														index.image,
 													);
-													setIsUpdate(true);
 													setIsModalOpen(true);
 												}}
 											>
@@ -309,9 +245,7 @@ export default function ResourceList(
 					<div class='modal-overlay'>
 						<div class='modal'>
 							<h2 class='text-xl font-bold mb-4'>
-								{isUpdate
-									? 'Update Resource'
-									: 'Create New Resource'}
+								Update Resource
 							</h2>
 							<div class='space-y-4'>
 								{/* Image Upload */}
@@ -444,9 +378,7 @@ export default function ResourceList(
 								<button
 									class='button-secondary'
 									onClick={() => {
-										if (isUpdate) {
-											setResource({});
-										}
+										setResource({});
 										setImagePreview(null);
 										setIsModalOpen(false);
 									}}
@@ -455,11 +387,9 @@ export default function ResourceList(
 								</button>
 								<button
 									class='button-primary'
-									onClick={isUpdate
-										? handleUpdateUser
-										: handleAddUser}
+									onClick={handleUpdateResource}
 								>
-									{isUpdate ? 'Update' : 'Create'}
+									Update
 								</button>
 							</div>
 						</div>

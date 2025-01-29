@@ -2,16 +2,20 @@ import { toName } from '../library/to-name.ts';
 import { ID, Operator, Reservation, Resource } from '../types.ts';
 import { useState } from 'preact/hooks';
 
+type ResourceDoc = Omit<Resource, 'creator'> & { creator: Operator };
+
 export default function Calendar({
 	reservations,
 	resources,
 	initialMonth,
 	initialYear,
+	searchTerm,
 }: {
 	reservations: Reservation[];
-	resources: (Omit<Resource, 'creator'> & { creator: Operator })[];
+	resources: ResourceDoc[];
 	initialMonth: number;
 	initialYear: number;
+	searchTerm: string;
 }) {
 	const [selectedMonth, setSelectedMonth] = useState<number>(initialMonth);
 	const [selectedYear, setSelectedYear] = useState<number>(initialYear);
@@ -26,12 +30,27 @@ export default function Calendar({
 		return resource ? toName(resource.name) : 'Unknown';
 	};
 
+	let resource: ResourceDoc | undefined;
+
+	if (searchTerm) {
+		resource = resources.find((res) =>
+			res.name.toLowerCase().includes(searchTerm.toLowerCase())
+		);
+	}
+
 	const getReservationsForDay = (day: number) => {
 		return reservations.filter((res) => {
 			const date = new Date(res.dateStarted);
-			return date.getDate() === day &&
+			const selectedDate = date.getDate() === day &&
 				date.getMonth() === selectedMonth &&
 				date.getFullYear() === selectedYear;
+
+			if (searchTerm) {
+				return selectedDate &&
+					JSON.stringify(res.resource) ===
+						JSON.stringify(resource?.id || []);
+			}
+			return selectedDate;
 		});
 	};
 

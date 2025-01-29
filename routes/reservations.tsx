@@ -4,7 +4,7 @@ import { Handlers } from '$fresh/server.ts';
 import { Head } from '$fresh/runtime.ts';
 import Header from '../islands/Header.tsx';
 import Bluebird from 'npm:bluebird';
-import ReservationCalendar from '../islands/ReservationCalendar.tsx';
+import ReservationCalendar from '../islands/ReservationPage.tsx';
 import { authorize } from '../middlewares/authorize.ts';
 import ResourceModel from '../models/resource.ts';
 import OperatorModel from '../models/operator.ts';
@@ -71,7 +71,7 @@ export const handler: Handlers = {
 				}
 
 				let status = reservation.status;
-				if (new Date(reservation.dateStarted) < new Date()) {
+				if (new Date(reservation.dateTimeStarted) < new Date()) {
 					status = 'EXPIRED';
 				}
 
