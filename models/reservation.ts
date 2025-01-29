@@ -98,15 +98,17 @@ class Model extends DefaultModel<Reservation> {
 
 	async getPeakHours() {
 		const reservations = await this.list();
-		const hours = reservations.reduce((acc, res) => {
-			const hour = new Date(res.dateTimeStarted).getHours();
-			acc[hour] = (acc[hour] || 0) + 1;
-			return acc;
-		}, {} as Record<number, number>);
+		const hours = Array.from({ length: 24 }, (_, hour) => ({
+			hour,
+			count: 0, // Initialize all hours to 0
+		}));
 
-		return Object.entries(hours)
-			.sort((a, b) => b[1] - a[1])
-			.map(([hour, count]) => ({ hour: parseInt(hour), count }));
+		reservations.forEach((res) => {
+			const hour = new Date(res.dateTimeStarted).getHours();
+			hours[hour].count += 1; // Increment the count for the respective hour
+		});
+
+		return hours;
 	}
 
 	async getCancelledRatio() {

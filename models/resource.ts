@@ -1,4 +1,5 @@
 import DefaultModel from '../library/model.ts';
+import { toName } from '../library/to-name.ts';
 import { Resource } from '../types.ts';
 import ReservationModel from './reservation.ts';
 
@@ -28,7 +29,12 @@ class Model extends DefaultModel<Resource> {
 				const resource = resources.find((res) =>
 					JSON.stringify(res.id) === id
 				);
-				return { resource: resource?.name || 'Unknown', count };
+				return {
+					resource: resource?.type
+						? toName(resource?.type as string)
+						: 'Unknown',
+					count,
+				};
 			},
 		);
 

@@ -104,11 +104,11 @@ export default function DashboardSummary({
 	};
 
 	const peakHoursChartData = {
-		labels: peakHours.map(({ hour }) => `${hour}:00`),
+		labels: Array.from({ length: 24 }, (_, i) => `${i}:00`), // Generate labels for all 24 hours
 		datasets: [
 			{
 				label: 'Peak Reservation Hours',
-				data: peakHours.map(({ count }) => count),
+				data: peakHours.map(({ count }) => count), // Map the counts directly
 				backgroundColor: 'rgba(153, 102, 255, 0.6)',
 				borderColor: 'rgba(153, 102, 255, 1)',
 				borderWidth: 2,
