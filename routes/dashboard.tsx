@@ -83,6 +83,10 @@ export default function Dashboard(
 					href='/css/dashboard.css'
 					rel='stylesheet'
 				/>
+				<script
+					src='/js/chart.js' //"https://cdn.jsdelivr.net/npm/chart.js"
+					defer
+				/>
 			</Head>
 			<Header activePage='/dashboard' operator={data.operator} />
 			<main class='container mx-auto p-6'>

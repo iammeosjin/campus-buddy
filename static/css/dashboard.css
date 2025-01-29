@@ -1,59 +1,53 @@
-/* admin-theme.css */
+.analytics-summary {
+	display: grid;
+	gap: 1.5rem;
+}
 
-/* Card Styles */
 .card {
-  cursor: pointer;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+	padding: 1.5rem;
+	border-radius: 0.5rem;
+	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+	transform: translateY(-5px);
+	box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .card-primary {
-  background-color: var(--highlight-color); /* Gold */
-  color: var(--white);
+	background-color: var(--highlight-color);
+	color: var(--white);
 }
 
 .card-secondary {
-  background-color: var(--primary-color); /* Dark Blue */
-  color: var(--white);
-}
-
-/* Adjusted Title Color for Better Readability on Dark Backgrounds */
-.card-secondary .card-title {
-  color: var(--highlight-color);
+	background-color: var(--primary-color);
+	color: var(--white);
 }
 
 .card-tertiary {
-  background-color: var(--text-color); /* Dark Gray */
-  color: var(--white);
+	background-color: var(--text-color);
+	color: var(--white);
 }
 
-.card-tertiary .card-title {
-  color: #f0f4fa;
-}
-
-/* Card Text Styles */
 .card-title {
-  font-size: 1.25rem;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+	font-size: 1.25rem;
+	font-weight: 700;
+	margin-bottom: 1rem;
 }
 
 .card-value {
-  font-size: 2rem;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
+	font-size: 1rem;
+	font-weight: 500;
 }
 
-/* Custom Hover Colors (Optional) */
-.card:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+.chart-container {
+	width: 100%;
+	height: 200px;
+	position: relative;
+}
+
+canvas {
+	max-width: 100%;
+	max-height: 200px;
 }

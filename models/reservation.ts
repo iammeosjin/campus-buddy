@@ -1,5 +1,7 @@
 import DefaultModel from '../library/model.ts';
 import { Reservation } from '../types.ts';
+//@deno-types=npm:@types/luxon
+import { DateTime } from 'npm:luxon';
 
 class Model extends DefaultModel<Reservation> {
 	override getPrefix() {
@@ -7,20 +9,26 @@ class Model extends DefaultModel<Reservation> {
 	}
 
 	async getTrends(range: 'daily' | 'weekly' | 'monthly') {
-		const now = new Date();
-		const rangeStart = new Date();
-		if (range === 'daily') rangeStart.setDate(now.getDate() - 1);
-		else if (range === 'weekly') rangeStart.setDate(now.getDate() - 7);
-		else if (range === 'monthly') rangeStart.setMonth(now.getMonth() - 1);
+		const filter = { start: new Date(), end: new Date() };
+		if (range === 'daily') {
+			filter.start = DateTime.now().startOf('day').toJSDate();
+			filter.end = DateTime.now().endOf('day').toJSDate();
+		} else if (range === 'weekly') {
+			filter.start = DateTime.now().startOf('week').toJSDate();
+			filter.end = DateTime.now().endOf('week').toJSDate();
+		} else if (range === 'monthly') {
+			filter.start = DateTime.now().startOf('month').toJSDate();
+			filter.end = DateTime.now().endOf('month').toJSDate();
+		}
 
 		const reservations = await this.list();
 		const trends = reservations.filter((res) => {
 			const startDate = new Date(res.dateTimeStarted);
-			return startDate >= rangeStart && startDate <= now;
+			return startDate >= filter.start && startDate <= filter.end;
 		});
 
 		const groupedTrends = trends.reduce((acc, res) => {
-			const dateKey = new Date(res.dateTimeStarted).toDateString();
+			const dateKey = new Date(res.dateTimeStarted).toISOString();
 			acc[dateKey] = (acc[dateKey] || 0) + 1;
 			return acc;
 		}, {} as Record<string, number>);

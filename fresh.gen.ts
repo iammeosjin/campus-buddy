@@ -30,6 +30,7 @@ import * as $reservations from './routes/reservations.tsx';
 import * as $resources from './routes/resources.tsx';
 import * as $users from './routes/users.tsx';
 import * as $Calendar from './islands/Calendar.tsx';
+import * as $Chart from './islands/Chart.tsx';
 import * as $Counter from './islands/Counter.tsx';
 import * as $DashboardSummary from './islands/DashboardSummary.tsx';
 import * as $FileUpload from './islands/FileUpload.tsx';
@@ -75,6 +76,7 @@ const manifest = {
 	},
 	islands: {
 		'./islands/Calendar.tsx': $Calendar,
+		'./islands/Chart.tsx': $Chart,
 		'./islands/Counter.tsx': $Counter,
 		'./islands/DashboardSummary.tsx': $DashboardSummary,
 		'./islands/FileUpload.tsx': $FileUpload,
