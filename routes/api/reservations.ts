@@ -8,6 +8,8 @@ import UserModel from '../../models/user.ts';
 import { toName } from '../../library/to-name.ts';
 //@deno-types=npm:@types/luxon
 import { DateTime } from 'npm:luxon';
+import Bluebird from 'npm:bluebird';
+import { Reservation } from '../../types.ts';
 
 export const handler: Handlers = {
 	async POST(req) {
@@ -50,6 +52,20 @@ export const handler: Handlers = {
 			...newReservation.user,
 			guid,
 		];
+
+		newReservation.dateStarted = new Date(newReservation.dateStarted)
+			.toISOString();
+
+		newReservation.dateTimeStarted = DateTime.fromFormat(
+			`${
+				DateTime.fromISO(newReservation.dateStarted).toFormat(
+					'MM/dd/yyyy',
+				)
+			} ${newReservation.dateTimeStarted}`,
+			'MM/dd/yyyy HH:mm',
+		).toISO();
+
+		console.log('dateTImeStarted', newReservation.dateTimeStarted);
 
 		if (newReservation.dateEnded) {
 			newReservation.dateEnded = newReservation.dateStarted;
@@ -113,6 +129,22 @@ export const handler: Handlers = {
 				res.user.join(';') === user
 			);
 		}
+
+		return new Response(
+			JSON.stringify(reservations),
+			{
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+			},
+		);
+	},
+	async DELETE() {
+		const reservations = await ReservationModel.list();
+
+		await Bluebird.map(
+			reservations,
+			(res: Reservation) => ReservationModel.delete(res.id),
+		);
 
 		return new Response(
 			JSON.stringify(reservations),

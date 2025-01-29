@@ -2,6 +2,7 @@ import ResourceAlreadyExists from '../errors/resource-already-exists.ts';
 import DefaultModel from '../library/model.ts';
 import { ID, User } from '../types.ts';
 import mergeDeepRight from 'https://deno.land/x/ramda@v0.27.2/source/mergeDeepRight.js';
+import ReservationModel from './reservation.ts';
 
 class Model extends DefaultModel<User> {
 	override getPrefix() {
@@ -85,6 +86,21 @@ class Model extends DefaultModel<User> {
 				.delete([`${this.getPrefix()}_by_email`, getRes.value.email])
 				.commit();
 		}
+	}
+
+	async getMonthlyActiveUsers() {
+		const now = new Date();
+		const oneMonthAgo = new Date();
+		oneMonthAgo.setMonth(now.getMonth() - 1);
+
+		const reservations = await ReservationModel.list();
+		const activeUsers = new Set(
+			reservations
+				.filter((res) => new Date(res.dateTimeStarted) >= oneMonthAgo)
+				.map((res) => res.user),
+		);
+
+		return activeUsers.size;
 	}
 }
 

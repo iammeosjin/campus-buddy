@@ -5,13 +5,7 @@ import Header from '../islands/Header.tsx';
 import DashboardSummary from '../islands/DashboardSummary.tsx';
 import { authorize } from '../middlewares/authorize.ts';
 import OperatorModel from '../models/operator.ts';
-import {
-	Operator,
-	Reservation,
-	Resource,
-	ResourceStatus,
-	User,
-} from '../types.ts';
+import { Operator } from '../types.ts';
 import ResourceModel from '../models/resource.ts';
 import UserModel from '../models/user.ts';
 import ReservationModel from '../models/reservation.ts';
@@ -34,21 +28,23 @@ export const handler: Handlers = {
 			});
 		}
 
-		const users = await UserModel.list();
-		const resources = await ResourceModel.list();
-		const reservations = await ReservationModel.list();
+		const trends = await ReservationModel.getTrends('monthly');
+		const popularTypes = await ResourceModel.getPopularTypes();
+		const peakHours = await ReservationModel.getPeakHours();
+		const monthlyActiveUsers = await UserModel.getMonthlyActiveUsers();
+		const cancelledRatio = await ReservationModel.getCancelledRatio();
 
-		console.log('reservations', reservations);
+		console.log('trends', trends);
 
 		return ctx.render({
 			operator,
-			users,
-			resources: resources.map((res) =>
-				res.status === ResourceStatus.AVAILABLE
-			),
-			reservations: reservations.filter((res) =>
-				res.status === 'PENDING'
-			),
+			analytics: {
+				trends,
+				popularTypes,
+				peakHours,
+				cancelledRatio,
+				monthlyActiveUsers,
+			},
 		});
 	},
 };
@@ -57,9 +53,17 @@ export default function Dashboard(
 	{ data }: {
 		data: {
 			operator: Operator;
-			users: User[];
-			resources: Resource[];
-			reservations: Reservation[];
+			analytics: {
+				trends: Record<string, number>;
+				popularTypes: { resource: string; count: number }[];
+				peakHours: { hour: number; count: number }[];
+				cancelledRatio: {
+					total: number;
+					cancelled: number;
+					ratio: number;
+				};
+				monthlyActiveUsers: number;
+			};
 		};
 	},
 ) {
@@ -91,7 +95,7 @@ export default function Dashboard(
 				>
 					Admin Dashboard
 				</h1>
-				<DashboardSummary data={data} />
+				<DashboardSummary data={data.analytics} />
 			</main>
 		</>
 	);

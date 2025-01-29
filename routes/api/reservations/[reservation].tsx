@@ -30,11 +30,6 @@ export const handler: Handlers = {
 		const resource = await ResourceModel.get(reservation?.resource as ID);
 
 		if (body.status === 'CANCELLED') {
-			console.log('body', {
-				body,
-				reservation,
-				resource,
-			});
 			const user = await authorize(req);
 			if (!user) {
 				return new Response('User not authorized', {

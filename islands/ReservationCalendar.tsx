@@ -88,7 +88,7 @@ export default function ReservationCalendar(
 		setItem({
 			status: 'APPROVED',
 		});
-		window.location.reload();
+		globalThis.location.reload();
 	};
 
 	// Filtered users based on search term
@@ -103,8 +103,6 @@ export default function ReservationCalendar(
 					));
 		},
 	);
-
-	console.log('filteredItems', filteredItems);
 
 	const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
@@ -161,7 +159,6 @@ export default function ReservationCalendar(
 								index.dateStarted,
 							);
 							const date = dateStarted.toFormat('yyyy-MM-dd');
-
 							const dateTimeStarted = DateTime.fromISO(
 								index.dateTimeStarted,
 							);

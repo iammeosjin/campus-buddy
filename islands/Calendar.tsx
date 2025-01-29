@@ -1,24 +1,118 @@
-// islands/Calendar.tsx
-import { useEffect, useState } from 'preact/hooks';
-import { Reservation } from '../types.ts';
+import { toName } from '../library/to-name.ts';
+import { ID, Operator, Reservation, Resource } from '../types.ts';
+import { useState } from 'preact/hooks';
 
-export default function Calendar() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+export default function Calendar({
+	reservations,
+	resources,
+	initialMonth,
+	initialYear,
+}: {
+	reservations: Reservation[];
+	resources: (Omit<Resource, 'creator'> & { creator: Operator })[];
+	initialMonth: number;
+	initialYear: number;
+}) {
+	const [selectedMonth, setSelectedMonth] = useState<number>(initialMonth);
+	const [selectedYear, setSelectedYear] = useState<number>(initialYear);
 
-  useEffect(() => {
-    // Fetch reservation data from your API
-    fetch('/api/reservations')
-      .then((res) => res.json())
-      .then((data) => setReservations(data));
-  }, []);
-  return (
-    <div class='calendar'>
-      {/* Simple calendar structure. Can integrate FullCalendar or similar library */}
-      {reservations.map((res) => (
-        <div key={res.id} class='reservation'>
-          {res.name} - {res.date}
-        </div>
-      ))}
-    </div>
-  );
+	const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+	const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
+
+	const getResourceName = (resourceId: ID): string => {
+		const resource = resources.find((res) =>
+			JSON.stringify(res.id) === JSON.stringify(resourceId)
+		);
+		return resource ? toName(resource.name) : 'Unknown';
+	};
+
+	const getReservationsForDay = (day: number) => {
+		return reservations.filter((res) => {
+			const date = new Date(res.dateStarted);
+			return date.getDate() === day &&
+				date.getMonth() === selectedMonth &&
+				date.getFullYear() === selectedYear;
+		});
+	};
+
+	// Generate calendar days with leading empty slots
+	const calendarDays = [
+		...Array(firstDayOfMonth).fill(null),
+		...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+	];
+
+	const handleMonthChange = (increment: number) => {
+		const newDate = new Date(selectedYear, selectedMonth + increment);
+		setSelectedMonth(newDate.getMonth());
+		setSelectedYear(newDate.getFullYear());
+	};
+
+	return (
+		<section class='calendar-section'>
+			<div class='calendar-container'>
+				<div class='calendar-header'>
+					<button
+						class='calendar-navigation button-secondary'
+						onClick={() => handleMonthChange(-1)}
+					>
+						Previous
+					</button>
+					<h2 class='calendar-month-title'>
+						{new Date(selectedYear, selectedMonth).toLocaleString(
+							'default',
+							{
+								month: 'long',
+								year: 'numeric',
+							},
+						)}
+					</h2>
+					<button
+						class='calendar-navigation button-secondary'
+						onClick={() => handleMonthChange(1)}
+					>
+						Next
+					</button>
+				</div>
+				<div class='calendar-grid'>
+					{calendarDays.map((day, index) => {
+						if (day === null) {
+							return (
+								<div
+									key={`empty-${index}`}
+									class='calendar-day empty'
+								>
+								</div>
+							);
+						}
+
+						const dayReservations = getReservationsForDay(day);
+						return (
+							<div class='calendar-day' key={day}>
+								<div class='day-number'>{day}</div>
+								<div class='reservations'>
+									{dayReservations.map((res) => (
+										<div
+											key={res.id.join(';')}
+											class='reservation-item'
+											title={`${
+												getResourceName(res.resource)
+											} (${
+												new Date(res.dateTimeStarted)
+													.toLocaleTimeString([], {
+														hour: '2-digit',
+														minute: '2-digit',
+													})
+											})`}
+										>
+											{getResourceName(res.resource)}
+										</div>
+									))}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		</section>
+	);
 }

@@ -1,0 +1,144 @@
+.calendar-section {
+	margin-bottom: 2em;
+}
+
+.calendar-header h2 {
+	color: var(--primary-color);
+	font-size: 1.5rem;
+	text-align: center;
+	flex: 1;
+}
+
+.calendar-month-title {
+	font-weight: bold;
+	color: var(--primary-color);
+	text-align: center;
+	margin-bottom: 1rem;
+	cursor: pointer;
+}
+
+.calendar-container {
+	background-color: var(--white);
+	padding: 0.5rem;
+	border: 1px solid var(--primary-color);
+	border-radius: 6px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	max-width: 800px; /* Ensures the calendar fits nicely */
+	margin: 0 auto; /* Center the calendar horizontally */
+	overflow: hidden; /* Prevent overflow */
+}
+
+.calendar-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+
+.calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr); /* Ensures 7 equally sized columns */
+	grid-auto-rows: minmax(60px, 1fr); /* Consistent row height */
+	gap: 4px;
+	justify-content: center;
+}
+
+.calendar-day {
+	text-align: center;
+	background-color: var(--background-color);
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+	padding: 4px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start; /* Align items to the top */
+	align-items: center;
+	font-size: 0.7rem;
+	height: 80px;
+}
+
+.calendar-day.today {
+	background-color: var(--highlight-color);
+	color: var(--white);
+	font-weight: bold;
+}
+
+.calendar-day .day-number {
+	font-size: 0.8rem;
+	font-weight: bold;
+	margin-bottom: 4px; /* Add space below the day number */
+}
+
+.calendar-day .reservations {
+	font-size: 0.6rem;
+	color: var(--text-color);
+	display: flex;
+	flex-direction: column;
+	gap: 2px; /* Space between reservation items */
+	align-items: center; /* Center the reservations horizontally */
+}
+
+.calendar-day .reservation-item {
+	background-color: var(--primary-color);
+	color: var(--white);
+	border-radius: 2px;
+	padding: 1px 4px;
+	margin-top: 2px;
+	font-size: 0.7rem;
+	letter-spacing: 1px;
+	font-weight: bold;
+	text-align: center;
+	overflow: hidden; /* Prevents overflow */
+	text-overflow: ellipsis; /* Adds ellipses for long text */
+	white-space: nowrap; /* Prevents wrapping */
+	cursor: pointer; /* Indicates the hoverable tooltip */
+}
+
+.calendar-day .reservation-item:hover {
+	background-color: var(--highlight-color);
+}
+
+.calendar-navigation button {
+	background-color: var(--primary-color);
+	color: var(--white);
+	border: none;
+	border-radius: 4px;
+	padding: 0.2rem 0.4rem;
+	cursor: pointer;
+	font-size: 0.7rem;
+}
+
+.calendar-navigation button:hover {
+	background-color: var(--highlight-color);
+}
+
+.calendar-day.empty {
+	background-color: transparent;
+	border: none;
+	pointer-events: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+	.calendar-header h2 {
+		font-size: 0.85rem;
+	}
+
+	.calendar-day {
+		font-size: 0.6rem;
+		height: 70px; /* Adjust height for smaller screens */
+	}
+
+	.calendar-day .day-number {
+		font-size: 0.7rem;
+	}
+
+	.calendar-day .reservations {
+		font-size: 0.5rem;
+	}
+
+	.calendar-navigation button {
+		font-size: 0.6rem;
+		padding: 0.1rem 0.3rem;
+	}
+}

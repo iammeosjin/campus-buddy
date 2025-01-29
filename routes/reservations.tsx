@@ -86,7 +86,6 @@ export const handler: Handlers = {
 			reservations.filter((reservation: any) => !!reservation)
 		);
 
-		console.log('res', res);
 		return ctx.render({
 			reservations: res,
 			operator,

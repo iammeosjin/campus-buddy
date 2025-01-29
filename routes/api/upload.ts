@@ -11,6 +11,7 @@ import {
 	UserStatus,
 } from '../../types.ts';
 import ResourceModel from '../../models/resource.ts';
+import ResourceAlreadyExistsError from '../../errors/resource-already-exists.ts';
 
 export const handler: Handlers = {
 	async POST(req) {
@@ -32,7 +33,7 @@ export const handler: Handlers = {
 				},
 			) as {
 				'Schoold ID': string;
-				'Name': string;
+				Name: string;
 				Email: string;
 			}[];
 
@@ -64,16 +65,21 @@ export const handler: Handlers = {
 							role: UserRole.STUDENT,
 						});
 					} catch (error) {
-						if (error.name !== 'RESOURCE_ALREADY_EXISTS') {
+						if (
+							(error as ResourceAlreadyExistsError).name !==
+								'RESOURCE_ALREADY_EXISTS'
+						) {
 							throw error;
 						}
 					}
 				});
 			} catch (error) {
-				console.error(error);
-				return new Response(error.message, {
-					status: 400,
-				});
+				return new Response(
+					(error as ResourceAlreadyExistsError).message,
+					{
+						status: 400,
+					},
+				);
 			}
 		}
 
@@ -119,16 +125,21 @@ export const handler: Handlers = {
 							id,
 						});
 					} catch (error) {
-						if (error.name !== 'RESOURCE_ALREADY_EXISTS') {
+						if (
+							(error as ResourceAlreadyExistsError).name !==
+								'RESOURCE_ALREADY_EXISTS'
+						) {
 							throw error;
 						}
 					}
 				});
 			} catch (error) {
-				console.error(error);
-				return new Response(error.message, {
-					status: 400,
-				});
+				return new Response(
+					(error as ResourceAlreadyExistsError).message,
+					{
+						status: 400,
+					},
+				);
 			}
 		}
 
