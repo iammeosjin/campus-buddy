@@ -13,6 +13,7 @@ import * as $api_reservations from './routes/api/reservations.ts';
 import * as $api_reservations_reservation_ from './routes/api/reservations/[reservation].tsx';
 import * as $api_resources from './routes/api/resources.ts';
 import * as $api_resources_resource_ from './routes/api/resources/[resource].ts';
+import * as $api_trends from './routes/api/trends.ts';
 import * as $api_upload from './routes/api/upload.ts';
 import * as $api_users from './routes/api/users.ts';
 import * as $api_users_user_ from './routes/api/users/[user].ts';
@@ -57,6 +58,7 @@ const manifest = {
 			$api_reservations_reservation_,
 		'./routes/api/resources.ts': $api_resources,
 		'./routes/api/resources/[resource].ts': $api_resources_resource_,
+		'./routes/api/trends.ts': $api_trends,
 		'./routes/api/upload.ts': $api_upload,
 		'./routes/api/users.ts': $api_users,
 		'./routes/api/users/[user].ts': $api_users_user_,

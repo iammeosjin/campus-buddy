@@ -8,8 +8,9 @@ class Model extends DefaultModel<Reservation> {
 		return 'reservations';
 	}
 
-	async getTrends(range: 'daily' | 'weekly' | 'monthly') {
+	async getTrends(range: 'daily' | 'weekly' | 'monthly' | 'yearly') {
 		const filter = { start: new Date(), end: new Date() };
+
 		if (range === 'daily') {
 			filter.start = DateTime.now().startOf('day').toJSDate();
 			filter.end = DateTime.now().endOf('day').toJSDate();
@@ -19,6 +20,9 @@ class Model extends DefaultModel<Reservation> {
 		} else if (range === 'monthly') {
 			filter.start = DateTime.now().startOf('month').toJSDate();
 			filter.end = DateTime.now().endOf('month').toJSDate();
+		} else if (range === 'yearly') {
+			filter.start = DateTime.now().startOf('year').toJSDate();
+			filter.end = DateTime.now().endOf('year').toJSDate();
 		}
 
 		const reservations = await this.list();
@@ -27,13 +31,69 @@ class Model extends DefaultModel<Reservation> {
 			return startDate >= filter.start && startDate <= filter.end;
 		});
 
-		const groupedTrends = trends.reduce((acc, res) => {
-			const dateKey = new Date(res.dateTimeStarted).toISOString();
-			acc[dateKey] = (acc[dateKey] || 0) + 1;
-			return acc;
-		}, {} as Record<string, number>);
+		if (range === 'daily' || range === 'weekly') {
+			// Initialize empty days of the week
+			const days = Array(7).fill(0);
+			trends.forEach((res) => {
+				const dayIndex = DateTime.fromISO(res.dateTimeStarted).weekday -
+					1; // 0 = Monday
+				days[dayIndex] += 1;
+			});
 
-		return groupedTrends;
+			return {
+				Monday: days[0],
+				Tuesday: days[1],
+				Wednesday: days[2],
+				Thursday: days[3],
+				Friday: days[4],
+				Saturday: days[5],
+				Sunday: days[6],
+			};
+		} else if (range === 'yearly') {
+			// Initialize empty months of the year
+			const months = Array(12).fill(0);
+			trends.forEach((res) => {
+				const monthIndex = DateTime.fromISO(res.dateTimeStarted).month -
+					1; // 0 = January
+				months[monthIndex] += 1;
+			});
+
+			return {
+				January: months[0],
+				February: months[1],
+				March: months[2],
+				April: months[3],
+				May: months[4],
+				June: months[5],
+				July: months[6],
+				August: months[7],
+				September: months[8],
+				October: months[9],
+				November: months[10],
+				December: months[11],
+			};
+		} else {
+			// Monthly trends (default: days of the month)
+			const startDate = DateTime.fromJSDate(filter.start);
+			const endDate = DateTime.fromJSDate(filter.end);
+			const allDays: Record<number, number> = {};
+
+			for (
+				let date = startDate;
+				date <= endDate;
+				date = date.plus({ days: 1 })
+			) {
+				allDays[date.day as number] = 0; // Initialize each day with 0 reservations
+			}
+
+			trends.forEach((res) => {
+				const dateKey = DateTime.fromISO(res.dateTimeStarted)
+					.day as number;
+				allDays[dateKey] += 1;
+			});
+
+			return allDays;
+		}
 	}
 
 	async getPeakHours() {

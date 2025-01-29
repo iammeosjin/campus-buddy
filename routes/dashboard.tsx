@@ -12,6 +12,9 @@ import ReservationModel from '../models/reservation.ts';
 
 export const handler: Handlers = {
 	async GET(req, ctx) {
+		const url = new URL(req.url);
+		const period = url.searchParams.get('period') || 'monthly';
+
 		const username = authorize(req);
 		if (!username) {
 			return new Response(null, {
@@ -28,13 +31,13 @@ export const handler: Handlers = {
 			});
 		}
 
-		const trends = await ReservationModel.getTrends('monthly');
+		const trends = await ReservationModel.getTrends(
+			period as 'weekly' | 'monthly' | 'yearly',
+		);
 		const popularTypes = await ResourceModel.getPopularTypes();
 		const peakHours = await ReservationModel.getPeakHours();
 		const monthlyActiveUsers = await UserModel.getMonthlyActiveUsers();
 		const cancelledRatio = await ReservationModel.getCancelledRatio();
-
-		console.log('trends', trends);
 
 		return ctx.render({
 			operator,
