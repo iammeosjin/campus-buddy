@@ -30,7 +30,7 @@
 }
 
 .card-tertiary .card-title {
-	color: var(--white); /* Gold, or any contrasting color */
+	color: var(--white); /* Contrasting white color */
 }
 
 .card-title {
@@ -39,9 +39,41 @@
 	margin-bottom: 1rem;
 }
 
+/* Scoped styles for the Monthly Active Users card */
+.monthly-active-value {
+	font-size: 5rem; /* Larger font size for the value */
+	font-weight: 800; /* Extra bold for emphasis */
+	text-align: center; /* Center align the value */
+	color: var(--primary-color); /* Ensure good contrast with the background */
+	margin-bottom: 0.2rem; /* Reduced spacing below the value */
+}
+
+.monthly-active-title {
+	font-size: 1.25rem; /* Smaller font for the title */
+	font-weight: 500; /* Regular weight for less emphasis */
+	text-align: center; /* Center align the title */
+	color: var(--primary-color); /* Match the card's text color */
+	margin-top: 0; /* Removed extra spacing above the title */
+}
+
 .card-value {
-	font-size: 1rem;
+	font-size: 2rem; /* Increased font size */
+	font-weight: 700; /* Bolder font weight */
+	line-height: 1.25; /* Better spacing for readability */
+	color: var(--white); /* Ensure high contrast */
+	text-align: center; /* Center-align the value for better focus */
+}
+
+.card-value-secondary {
+	font-size: 1rem; /* Smaller text for the list */
 	font-weight: 500;
+	line-height: 1.5rem; /* Adjust line height for better spacing */
+	display: flex;
+	align-items: center; /* Align items vertically */
+}
+
+.card-value-secondary b {
+	margin-right: 0.5rem; /* Add spacing between the resource name and count */
 }
 
 .chart-container {
@@ -55,7 +87,6 @@ canvas {
 	max-height: 200px;
 }
 
-/* Dashboard Grid Layout */
 .analytics-summary {
 	display: grid;
 	grid-template-rows: auto auto auto; /* Explicit rows */
@@ -75,8 +106,13 @@ canvas {
 
 	.analytics-summary > .row-2 {
 		display: grid;
-		grid-template-columns:
-			1fr 1fr; /* Two charts per row for subsequent rows */
+		grid-template-columns: 1fr 1fr; /* Two charts per row for second row */
+		column-gap: 1.5rem;
+	}
+
+	.analytics-summary > .row-3 {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr); /* Three equal columns */
 		column-gap: 1.5rem;
 	}
 }

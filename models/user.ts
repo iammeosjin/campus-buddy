@@ -97,7 +97,7 @@ class Model extends DefaultModel<User> {
 		const activeUsers = new Set(
 			reservations
 				.filter((res) => new Date(res.dateTimeStarted) >= oneMonthAgo)
-				.map((res) => res.user),
+				.map((res) => JSON.stringify(res.user)),
 		);
 
 		return activeUsers.size;

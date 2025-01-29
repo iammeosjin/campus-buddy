@@ -1,3 +1,4 @@
+import Bluebird from 'npm:bluebird';
 import DefaultModel from '../library/model.ts';
 import { toName } from '../library/to-name.ts';
 import { Resource } from '../types.ts';
@@ -39,6 +40,27 @@ class Model extends DefaultModel<Resource> {
 		);
 
 		return result;
+	}
+
+	async getTopReservedResources() {
+		const resources = await this.list();
+		const reservationCounts: { resource: string; count: number }[] =
+			await Bluebird.map(
+				resources,
+				async (resource: Resource) => {
+					const reservations = await ReservationModel.list({
+						prefix: resource.id,
+					});
+					return {
+						resource: resource.name,
+						count: reservations.length, // Assuming resources have a `reservations` field
+					};
+				},
+			);
+
+		return reservationCounts
+			.sort((a, b) => b.count - a.count) // Sort by reservation count in descending order
+			.slice(0, 3); // Take the top 3
 	}
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import Chart from './Chart.tsx';
+import { toName } from '../library/to-name.ts';
 
 export default function DashboardSummary({
 	data: {
@@ -8,6 +9,7 @@ export default function DashboardSummary({
 		peakHours,
 		cancelledRatio,
 		monthlyActiveUsers,
+		topResources,
 	},
 }: {
 	data: {
@@ -16,6 +18,7 @@ export default function DashboardSummary({
 		peakHours: { hour: number; count: number }[];
 		cancelledRatio: { total: number; cancelled: number; ratio: number };
 		monthlyActiveUsers: number;
+		topResources: { resource: string; count: number }[];
 	};
 }) {
 	const [selectedPeriod, setSelectedPeriod] = useState<
@@ -154,23 +157,31 @@ export default function DashboardSummary({
 				</div>
 			</div>
 
-			{/* Row 3: Two Charts */}
-			<div class='row-2'>
+			{/* Row 3: Three Cards */}
+			<div class='row-3'>
 				<div class='card card-secondary'>
 					<h3 class='card-title'>Cancelled Bookings Ratio</h3>
 					<p class='card-value text-2xl font-bold'>
 						{cancelledRatio.cancelled} out of {cancelledRatio.total}
 						{' '}
-						bookings (
-						{cancelledRatio.ratio.toFixed(2)}%)
+						bookings ({cancelledRatio.ratio.toFixed(2)}%)
 					</p>
 				</div>
 
 				<div class='card card-primary'>
-					<h3 class='card-title'>Monthly Active Users</h3>
-					<p class='card-value text-3xl font-bold'>
-						{monthlyActiveUsers}
-					</p>
+					<p class='monthly-active-value'>{monthlyActiveUsers}</p>
+					<h3 class='monthly-active-title'>Monthly Active Users</h3>
+				</div>
+
+				<div class='card card-tertiary'>
+					<h3 class='card-title'>Top 3 Most Reserved Resources</h3>
+					<ul class='list-none pl-0'>
+						{topResources.slice(0, 3).map(({ resource, count }) => (
+							<li key={resource} class='card-value-secondary'>
+								<b>{toName(resource)}</b>: {count} reservations
+							</li>
+						))}
+					</ul>
 				</div>
 			</div>
 		</div>

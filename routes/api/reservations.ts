@@ -64,8 +64,6 @@ export const handler: Handlers = {
 			'MM/dd/yyyy HH:mm',
 		).toISO();
 
-		console.log('dateTImeStarted', newReservation.dateTimeStarted);
-
 		if (newReservation.dateEnded) {
 			newReservation.dateEnded = newReservation.dateStarted;
 		}

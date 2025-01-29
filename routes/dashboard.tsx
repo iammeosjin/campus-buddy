@@ -38,6 +38,7 @@ export const handler: Handlers = {
 		const peakHours = await ReservationModel.getPeakHours();
 		const monthlyActiveUsers = await UserModel.getMonthlyActiveUsers();
 		const cancelledRatio = await ReservationModel.getCancelledRatio();
+		const topResources = await ResourceModel.getTopReservedResources();
 
 		return ctx.render({
 			operator,
@@ -47,6 +48,7 @@ export const handler: Handlers = {
 				peakHours,
 				cancelledRatio,
 				monthlyActiveUsers,
+				topResources,
 			},
 		});
 	},
@@ -66,6 +68,7 @@ export default function Dashboard(
 					ratio: number;
 				};
 				monthlyActiveUsers: number;
+				topResources: { resource: string; count: number }[];
 			};
 		};
 	},
