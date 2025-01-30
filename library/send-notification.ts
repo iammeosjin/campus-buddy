@@ -26,7 +26,7 @@ export default async function sendNotification({ title, topic, body }: {
 	title: string;
 	body: string;
 }) {
-	if (Deno.env.get('DENO_ENV') !== 'development') return;
+	if (Deno.env.get('ENVIRONMENT') !== 'development') return;
 
 	const message = {
 		notification: {
