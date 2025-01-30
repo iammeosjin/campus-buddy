@@ -10,6 +10,7 @@ import { toName } from '../../library/to-name.ts';
 import { DateTime } from 'npm:luxon';
 import Bluebird from 'npm:bluebird';
 import { Reservation } from '../../types.ts';
+import sendNotification from '../../library/send-notification.ts';
 
 export const handler: Handlers = {
 	async POST(req) {
@@ -98,10 +99,16 @@ export const handler: Handlers = {
 			dateTimeCreated: new Date().toISOString(),
 		});
 
+		await sendNotification({
+			topic: 'general_notifications',
+			title: 'New Reservation',
+			body: `${toName(user.name)} booked ${toName(resource.name)}`,
+		});
+
 		return new Response(
 			JSON.stringify(response),
 			{
-				status: 201,
+				status: 200,
 				headers: { 'Content-Type': 'application/json' },
 			},
 		);
@@ -109,13 +116,12 @@ export const handler: Handlers = {
 	async GET(req) {
 		const platform = req.headers.get('X-PLATFORM');
 		let user: undefined | string | null;
-		console.log('platform', platform);
 		if (platform === 'mobile') {
 			user = await authorize(req);
 		}
 		let reservations = await ReservationModel.list().then((res) =>
 			res.map((res) =>
-				new Date(res.dateStarted) < new Date()
+				new Date(res.dateTimeStarted) < new Date()
 					? { ...res, status: 'EXPIRED' }
 					: res
 			)
