@@ -32,7 +32,7 @@ export default async function sendNotification({ title, topic, body }: {
 			title: title,
 			body: body,
 		},
-		topic: `/topics/${topic}`,
+		token: `/topics/${topic}`,
 	};
 
 	try {
