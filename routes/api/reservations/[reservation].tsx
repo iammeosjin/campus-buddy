@@ -31,14 +31,6 @@ export const handler: Handlers = {
 			ctx.params.reservation.split(';'),
 		);
 
-		console.log({
-			data,
-			body: omit(
-				['id', 'guid', 'dateTimeCreated', 'resource', 'user'],
-				body,
-			),
-		});
-
 		await ReservationModel.insert({
 			...data,
 			...omit(

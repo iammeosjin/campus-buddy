@@ -21,6 +21,7 @@ export const handler: Handlers = {
 
 		// Extract form-data values
 		for (const entry of formData.entries()) {
+			console.log('entry', entry);
 			const [key, value] = entry;
 			if (key === 'requestFormImage' && value instanceof File) {
 				newReservation[key] = await uploadToPinata(value);
