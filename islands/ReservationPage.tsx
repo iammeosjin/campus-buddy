@@ -28,6 +28,9 @@ export default function ReservationPage(
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [item, setItem] = useState<Partial<Reservation>>({
 		status: 'APPROVED',
+		dateTimeStarted: DateTime.now().startOf('hour').toFormat('HH:00'),
+		dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
+			.toFormat('HH:00'),
 	});
 	const [resourceSearch, setResourceSearch] = useState('');
 	const [userSearch, setUserSearch] = useState('');
@@ -70,6 +73,9 @@ export default function ReservationPage(
 		setIsModalOpen(false);
 		setItem({
 			status: 'APPROVED',
+			dateTimeStarted: DateTime.now().startOf('hour').toFormat('HH:00'),
+			dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
+				.toFormat('HH:00'),
 		});
 	};
 
@@ -87,6 +93,9 @@ export default function ReservationPage(
 		setIsModalOpen(false);
 		setItem({
 			status: 'APPROVED',
+			dateTimeStarted: DateTime.now().startOf('hour').toFormat('HH:00'),
+			dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
+				.toFormat('HH:00'),
 		});
 		globalThis.location.reload();
 	};
@@ -162,7 +171,12 @@ export default function ReservationPage(
 							const dateTimeStarted = DateTime.fromISO(
 								index.dateTimeStarted,
 							);
-							const time = `${dateTimeStarted.toFormat('HH:mm')}`;
+							const dateTimeEnded = DateTime.fromISO(
+								index.dateTimeEnded,
+							);
+							const time = `${
+								dateTimeStarted.toFormat('HH:mm')
+							} - ${dateTimeEnded.toFormat('HH:mm')}`;
 							return (
 								<tr key={index.id.join('-')}>
 									<td>
@@ -438,26 +452,66 @@ export default function ReservationPage(
 								/>
 							</label>
 
-							{/* Time Picker */}
-							<label>
-								Time:
-								<input
-									type='time'
-									step='3600'
-									pattern='^([01][0-9]|2[0-3]):00$'
-									class='border border-gray-300 rounded-md p-2 w-full'
-									value={item.dateTimeStarted ||
-										DateTime.now().startOf('hour').toFormat(
-											'hh:mm',
-										)}
-									onInput={(e) =>
-										setItem({
-											...item,
-											dateTimeStarted:
-												e.currentTarget.value,
-										})}
-								/>
-							</label>
+							<div class='flex space-x-4'>
+								{/* Start Time Input */}
+								<div class='flex-1'>
+									<label class='block text-sm font-medium text-gray-700'>
+										Start Time:
+									</label>
+									<input
+										type='time'
+										step='3600'
+										pattern='^([01][0-9]|2[0-3]):00$'
+										class='border border-gray-300 rounded-md p-2 w-full'
+										value={item.dateTimeStarted || ''}
+										onInput={(e) => {
+											const newStartTime =
+												e.currentTarget.value;
+											setItem({
+												...item,
+												dateTimeStarted: newStartTime,
+												dateTimeEnded:
+													item.dateTimeEnded &&
+														newStartTime >=
+															item.dateTimeEnded
+														? DateTime.fromFormat(
+															newStartTime,
+															'HH:mm',
+														).plus({ hours: 1 })
+															.toFormat('HH:00')
+														: item.dateTimeEnded,
+											});
+										}}
+									/>
+								</div>
+
+								{/* End Time Input */}
+								<div class='flex-1'>
+									<label class='block text-sm font-medium text-gray-700'>
+										End Time:
+									</label>
+									<input
+										type='time'
+										step='3600'
+										pattern='^([01][0-9]|2[0-3]):00$'
+										class='border border-gray-300 rounded-md p-2 w-full'
+										value={item.dateTimeEnded || ''}
+										onInput={(e) => {
+											const newEndTime =
+												e.currentTarget.value;
+											if (
+												newEndTime >
+													item.dateTimeStarted!
+											) {
+												setItem({
+													...item,
+													dateTimeEnded: newEndTime,
+												});
+											}
+										}}
+									/>
+								</div>
+							</div>
 
 							{/* Other Inputs */}
 							<select

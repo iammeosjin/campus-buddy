@@ -8,6 +8,7 @@ export const handler: Handlers = {
 	async POST(req) {
 		const formData = await req.json();
 		const user = await UserModel.getUserByEmail(formData.email);
+		console.log({ user, formData });
 		if (!user || formData?.password !== user?.password) {
 			return new Response('Invalid username or password', {
 				status: 401,

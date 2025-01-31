@@ -15,7 +15,6 @@ import sendNotification from '../../library/send-notification.ts';
 export const handler: Handlers = {
 	async POST(req) {
 		const newReservation = await req.json();
-		console.log('newReservation', newReservation);
 		const resource = await ResourceModel.get(newReservation.resource);
 
 		if (!resource) {
@@ -65,13 +64,22 @@ export const handler: Handlers = {
 			'MM/dd/yyyy HH:mm',
 		).toISO();
 
-		if (newReservation.dateEnded) {
+		if (!newReservation.dateEnded) {
 			newReservation.dateEnded = newReservation.dateStarted;
 		}
 
 		if (newReservation.dateTimeEnded) {
-			newReservation.dateTimeEnded = newReservation.dateTimeStarted;
+			newReservation.dateTimeEnded = DateTime.fromFormat(
+				`${
+					DateTime.fromISO(newReservation.dateStarted).toFormat(
+						'MM/dd/yyyy',
+					)
+				} ${newReservation.dateTimeEnded}`,
+				'MM/dd/yyyy HH:mm',
+			).toISO();
 		}
+
+		console.log('newReservation', newReservation);
 
 		const response = {
 			...newReservation,
