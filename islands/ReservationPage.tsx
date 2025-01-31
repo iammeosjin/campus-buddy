@@ -32,6 +32,15 @@ export default function ReservationPage(
 		dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
 			.toFormat('HH:00'),
 	});
+	const [requestFormImage, setRequestFormImage] = useState<File | null>(null);
+
+	const handleProofUpload = (e: Event) => {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (file) {
+			setRequestFormImage(file);
+		}
+	};
+
 	const [resourceSearch, setResourceSearch] = useState('');
 	const [userSearch, setUserSearch] = useState('');
 	const [isResourceDropdownOpen, setIsResourceDropdownOpen] = useState(false);
@@ -54,49 +63,36 @@ export default function ReservationPage(
 		}
 	};
 
-	const handleAddReservation = async () => {
-		const response = await fetch(`/api/reservations`, {
-			method: 'POST',
-			body: JSON.stringify(item),
+	const handleSubmit = async () => {
+		const formData = new FormData();
+		formData.append('status', item.status || '');
+		formData.append('dateTimeStarted', item.dateTimeStarted || '');
+		formData.append('dateTimeEnded', item.dateTimeEnded || '');
+		formData.append('dateStarted', item.dateStarted || '');
+		formData.append('remarks', item.remarks || '');
+		formData.append('resource', JSON.stringify(item.resource));
+		formData.append('user', JSON.stringify(item.user));
+		if (requestFormImage) {
+			formData.append('requestFormImage', requestFormImage);
+		}
+
+		const url = isUpdate
+			? `/api/reservations/${item.id?.join(';')}`
+			: `/api/reservations`;
+		const method = isUpdate ? 'PATCH' : 'POST';
+
+		const response = await fetch(url, {
+			method,
+			body: formData,
 		});
 
-		if (!response.ok) return;
-
-		const res = await response.json();
-		setItems([{
-			...res,
-			user: params.users.find((user) => user.sid === res.user[0]) as User,
-			resource: params.resources.find((resource) =>
-				equals(resource.id, res.resource)
-			) as Resource,
-		}, ...items]);
-		setIsModalOpen(false);
-		setItem({
-			status: 'APPROVED',
-			dateTimeStarted: DateTime.now().startOf('hour').toFormat('HH:00'),
-			dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
-				.toFormat('HH:00'),
-		});
-	};
-
-	const handleUpdateReservation = async () => {
-		if (!item) return;
-		const response = await fetch(
-			`/api/reservations/${item.id?.join(';')}`,
-			{
-				method: 'PATCH',
-				body: JSON.stringify(item),
-			},
-		);
-		if (!response.ok) return;
+		if (!response.ok) {
+			const data = await response.json();
+			alert(data.message);
+			return;
+		}
 		setIsUpdate(false);
 		setIsModalOpen(false);
-		setItem({
-			status: 'APPROVED',
-			dateTimeStarted: DateTime.now().startOf('hour').toFormat('HH:00'),
-			dateTimeEnded: DateTime.now().plus({ hours: 1 }).startOf('hour')
-				.toFormat('HH:00'),
-		});
 		globalThis.location.reload();
 	};
 
@@ -159,24 +155,12 @@ export default function ReservationPage(
 							<th class='border px-4 py-2'>Time</th>
 							<th class='border px-4 py-2'>Status</th>
 							<th class='border px-4 py-2'>Remarks</th>
+							<th>Request Form</th>
 							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						{list.map((index) => {
-							const dateStarted = DateTime.fromISO(
-								index.dateStarted,
-							);
-							const date = dateStarted.toFormat('yyyy-MM-dd');
-							const dateTimeStarted = DateTime.fromISO(
-								index.dateTimeStarted,
-							);
-							const dateTimeEnded = DateTime.fromISO(
-								index.dateTimeEnded,
-							);
-							const time = `${
-								dateTimeStarted.toFormat('HH:mm')
-							} - ${dateTimeEnded.toFormat('HH:mm')}`;
 							return (
 								<tr key={index.id.join('-')}>
 									<td>
@@ -192,12 +176,42 @@ export default function ReservationPage(
 										</b>
 									</td>
 									<td>{index.resource?.location || 'N/A'}</td>
-									<td>{date}</td>
-									<td>{time}</td>
+									<td>
+										{DateTime.fromISO(index.dateStarted)
+											.toFormat('yyyy-MM-dd')}
+									</td>
+									<td>
+										{`${
+											DateTime.fromISO(
+												index.dateTimeStarted,
+											).toFormat('HH:mm')
+										} - ${
+											DateTime.fromISO(
+												index.dateTimeEnded!,
+											).toFormat('HH:mm')
+										}`}
+									</td>
 									<td>
 										<b>{index.status}</b>
 									</td>
 									<td>{index.remarks}</td>
+									<td>
+										{index.requestFormImage
+											? (
+												<a
+													href={`https://gateway.pinata.cloud/ipfs/${index.requestFormImage}`}
+													download
+													class='text-blue-600 underline'
+												>
+													Preview
+												</a>
+											)
+											: (
+												<span class='text-gray-500'>
+													No file
+												</span>
+											)}
+									</td>
 									<td>
 										<div class='flex space-x-2'>
 											<button
@@ -443,7 +457,11 @@ export default function ReservationPage(
 								<input
 									type='date'
 									class='border border-gray-300 rounded-md p-2 w-full'
-									value={item.dateStarted || ''}
+									value={item.dateStarted
+										? DateTime.fromISO(
+											item.dateStarted,
+										).toFormat('yyyy-MM-dd')
+										: ''}
 									onInput={(e) =>
 										setItem({
 											...item,
@@ -463,7 +481,11 @@ export default function ReservationPage(
 										step='3600'
 										pattern='^([01][0-9]|2[0-3]):00$'
 										class='border border-gray-300 rounded-md p-2 w-full'
-										value={item.dateTimeStarted || ''}
+										value={item.dateTimeStarted
+											? DateTime.fromISO(
+												item.dateTimeStarted,
+											).toFormat('HH:mm')
+											: ''}
 										onInput={(e) => {
 											const newStartTime =
 												e.currentTarget.value;
@@ -495,7 +517,11 @@ export default function ReservationPage(
 										step='3600'
 										pattern='^([01][0-9]|2[0-3]):00$'
 										class='border border-gray-300 rounded-md p-2 w-full'
-										value={item.dateTimeEnded || ''}
+										value={item.dateTimeEnded
+											? DateTime.fromISO(
+												item.dateTimeEnded,
+											).toFormat('HH:mm')
+											: ''}
 										onInput={(e) => {
 											const newEndTime =
 												e.currentTarget.value;
@@ -506,6 +532,17 @@ export default function ReservationPage(
 												setItem({
 													...item,
 													dateTimeEnded: newEndTime,
+												});
+											} else {
+												setItem({
+													...item,
+													dateTimeEnded: DateTime
+														.fromFormat(
+															item.dateTimeStarted!,
+															'HH:mm',
+														)
+														.plus({ hours: 1 })
+														.toFormat('HH:00'),
 												});
 											}
 										}}
@@ -539,20 +576,56 @@ export default function ReservationPage(
 										remarks: e.currentTarget.value,
 									})}
 							/>
+							<label class='block text-sm font-medium text-gray-700'>
+								Request Form Image:
+							</label>
+							<div class='file-input-container'>
+								<input
+									type='file'
+									accept='image/*'
+									class='file-upload-input'
+									id='fileUpload'
+									onChange={handleProofUpload}
+								/>
+								<label
+									for='fileUpload'
+									class='file-upload-label'
+								>
+									Choose File
+								</label>
+								<span class='file-name'>
+									{requestFormImage
+										? requestFormImage.name
+										: 'No file chosen'}
+								</span>
+							</div>
 						</div>
 
 						<div class='flex justify-end space-x-2 mt-4'>
 							<button
 								class='button-secondary'
-								onClick={() => setIsModalOpen(false)}
+								onClick={() => {
+									setItem({
+										status: 'APPROVED',
+										dateTimeStarted: DateTime.now().startOf(
+											'hour',
+										).toFormat('HH:00'),
+										dateTimeEnded: DateTime.now().plus({
+											hours: 1,
+										}).startOf('hour')
+											.toFormat('HH:00'),
+									});
+									setIsUpdate(false);
+									setResourceSearch('');
+									setUserSearch('');
+									setIsModalOpen(false);
+								}}
 							>
 								Cancel
 							</button>
 							<button
 								class='button-primary'
-								onClick={isUpdate
-									? handleUpdateReservation
-									: handleAddReservation}
+								onClick={handleSubmit}
 							>
 								{isUpdate ? 'Update' : 'Create'}
 							</button>

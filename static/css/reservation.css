@@ -1,0 +1,38 @@
+/* File Input Container */
+.file-input-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+/* Hidden File Input */
+.file-upload-input {
+	display: none;
+}
+
+/* Custom Label for File Input */
+.file-upload-label {
+	background-color: var(--primary-color);
+	color: var(--white);
+	padding: 0.5rem 1rem;
+	border-radius: 0.25rem;
+	font-weight: bold;
+	cursor: pointer;
+	text-align: center;
+	transition: background-color 0.2s ease;
+}
+
+.file-upload-label:hover {
+	background-color: #395feb; /* Slightly darker shade on hover */
+}
+
+/* Selected File Name Display */
+.file-name {
+	font-size: 0.875rem;
+	color: var(--text-color);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 200px;
+}

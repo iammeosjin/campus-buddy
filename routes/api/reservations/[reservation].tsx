@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { Handlers } from '$fresh/server.ts';
 import { authorize } from '../../../library/authorize.ts';
 import ReservationModel from '../../../models/reservation.ts';
@@ -10,23 +11,45 @@ import { ID, UserStatus } from '../../../types.ts';
 import NotificationModel from '../../../models/notification.ts';
 import ResourceModel from '../../../models/resource.ts';
 import { toName } from '../../../library/to-name.ts';
+import { uploadToPinata } from '../../../library/ipfs.ts';
 
 export const handler: Handlers = {
 	async PATCH(req, ctx) {
-		const body = await req.json();
+		const formData = await req.formData();
+		const body: Record<string, any> = {};
+
+		for (const entry of formData.entries()) {
+			const [key, value] = entry;
+			if (key === 'requestFormImage' && value instanceof File) {
+				body.requestFormImage = await uploadToPinata(value); // Handle file upload
+			} else {
+				body[key] = value;
+			}
+		}
+
 		const data = await ReservationModel.get(
 			ctx.params.reservation.split(';'),
 		);
 
+		console.log({
+			data,
+			body: omit(
+				['id', 'guid', 'dateTimeCreated', 'resource', 'user'],
+				body,
+			),
+		});
+
 		await ReservationModel.insert({
 			...data,
-			...omit(['id', 'guid', 'dateTimeCreated'], body),
+			...omit(
+				['id', 'guid', 'dateTimeCreated', 'resource', 'user'],
+				body,
+			),
 		});
 
 		const reservation = await ReservationModel.get(
 			ctx.params.reservation.split(';'),
 		);
-
 		const resource = await ResourceModel.get(reservation?.resource as ID);
 
 		if (body.status === 'CANCELLED') {
@@ -56,7 +79,7 @@ export const handler: Handlers = {
 					reservation: reservation!.id,
 					title: `${toName(resource!.name)} cancelled`,
 					body: `${
-						3 - (reservations.length)
+						3 - reservations.length
 					} more cancellations and your account will be suspended`,
 					image: resource!.image,
 					location: resource!.location,
@@ -84,6 +107,7 @@ export const handler: Handlers = {
 				dateTimeCreated: new Date().toISOString(),
 			});
 		}
+
 		const headers = new Headers();
 		return new Response(null, {
 			status: 201, // See Other

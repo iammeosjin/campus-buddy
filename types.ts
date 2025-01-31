@@ -100,4 +100,5 @@ export type Reservation = {
 	dateTimeEnded: string;
 	remarks?: string;
 	dateTimeCreated: string;
+	requestFormImage: string;
 };

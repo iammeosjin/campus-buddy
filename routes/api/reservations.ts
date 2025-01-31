@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 // routes/api/reservations.ts
 import { Handlers } from '$fresh/server.ts';
 import { authorize } from '../../library/authorize.ts';
@@ -11,10 +12,26 @@ import { DateTime } from 'npm:luxon';
 import Bluebird from 'npm:bluebird';
 import { Reservation } from '../../types.ts';
 import sendNotification from '../../library/send-notification.ts';
+import { uploadToPinata } from '../../library/ipfs.ts';
 
 export const handler: Handlers = {
 	async POST(req) {
-		const newReservation = await req.json();
+		const formData = await req.formData();
+		const newReservation: any = {};
+
+		// Extract form-data values
+		for (const entry of formData.entries()) {
+			const [key, value] = entry;
+			if (key === 'requestFormImage' && value instanceof File) {
+				newReservation[key] = await uploadToPinata(value);
+			} else if (['resource', 'user'].includes(key)) {
+				newReservation[key] = JSON.parse(value as string); // Parse JSON fields
+			} else {
+				newReservation[key] = value;
+			}
+		}
+
+		// Get Resource & Validate
 		const resource = await ResourceModel.get(newReservation.resource);
 
 		if (!resource) {
@@ -27,6 +44,7 @@ export const handler: Handlers = {
 			);
 		}
 
+		// Get User ID
 		const userId = await authorize(req);
 		if (userId) {
 			newReservation.user = [userId];
@@ -34,7 +52,6 @@ export const handler: Handlers = {
 		}
 
 		const user = await UserModel.get(newReservation.user);
-
 		if (!user) {
 			return new Response(
 				JSON.stringify({ message: 'User not found' }),
@@ -45,16 +62,31 @@ export const handler: Handlers = {
 			);
 		}
 
-		const guid = crypto.randomUUID();
-		const id = [
-			...newReservation.resource,
-			...newReservation.user,
-			guid,
-		];
+		const reservations = await ReservationModel.list({
+			prefix: resource.id,
+		}).then((ress) =>
+			ress.filter((res) =>
+				res.status === 'APPROVED' || res.status === 'PENDING'
+			)
+		);
 
+		if (resource.capacity <= reservations.length) {
+			return new Response(
+				JSON.stringify({ message: 'Resource capacity not enough' }),
+				{
+					status: 400,
+					headers: { 'Content-Type': 'application/json' },
+				},
+			);
+		}
+
+		// Generate Reservation ID
+		const guid = crypto.randomUUID();
+		const id = [...newReservation.resource, ...newReservation.user, guid];
+
+		// Convert Dates
 		newReservation.dateStarted = new Date(newReservation.dateStarted)
 			.toISOString();
-
 		newReservation.dateTimeStarted = DateTime.fromFormat(
 			`${
 				DateTime.fromISO(newReservation.dateStarted).toFormat(
@@ -79,8 +111,53 @@ export const handler: Handlers = {
 			).toISO();
 		}
 
-		console.log('newReservation', newReservation);
+		try {
+			reservations.map((res) => {
+				const dateTimeStarted = DateTime.fromISO(res.dateTimeStarted);
+				const dateTimeEnded = DateTime.fromISO(res.dateTimeEnded);
+				console.log({
+					dateTimeStarted,
+					dateTimeEnded,
+					newReservation,
+				});
+				if (
+					DateTime.fromISO(newReservation.dateTimeStarted) >=
+						dateTimeStarted &&
+					DateTime.fromISO(newReservation.dateTimeStarted) <
+						dateTimeEnded
+				) {
+					throw new Error('Conflict');
+				}
 
+				if (
+					DateTime.fromISO(newReservation.dateTimeEnded) >
+						dateTimeStarted &&
+					DateTime.fromISO(newReservation.dateTimeEnded) <=
+						dateTimeEnded
+				) {
+					throw new Error('Conflict');
+				}
+
+				if (
+					DateTime.fromISO(newReservation.dateTimeStarted) <=
+						dateTimeStarted &&
+					DateTime.fromISO(newReservation.dateTimeEnded) >=
+						dateTimeEnded
+				) {
+					throw new Error('Conflict');
+				}
+			});
+		} catch {
+			return new Response(
+				JSON.stringify({ message: 'Time slot not available' }),
+				{
+					status: 409,
+					headers: { 'Content-Type': 'application/json' },
+				},
+			);
+		}
+
+		// Create Reservation Response
 		const response = {
 			...newReservation,
 			dateTimeCreated: new Date().toISOString(),
@@ -88,7 +165,10 @@ export const handler: Handlers = {
 			id,
 		};
 
+		// Store in Database
 		await ReservationModel.insert(response);
+
+		// Create Notification
 		const nid = crypto.randomUUID();
 		await NotificationModel.insert({
 			id: [...response.user, nid],
@@ -107,7 +187,8 @@ export const handler: Handlers = {
 			dateTimeCreated: new Date().toISOString(),
 		});
 
-		await sendNotification({
+		// Send Notification
+		sendNotification({
 			topic: 'general_notifications',
 			title: 'New Reservation',
 			body: `${toName(user.name)} booked ${toName(resource.name)}`,
@@ -121,6 +202,7 @@ export const handler: Handlers = {
 			},
 		);
 	},
+
 	async GET(req) {
 		const platform = req.headers.get('X-PLATFORM');
 		let user: undefined | string | null;
@@ -149,6 +231,7 @@ export const handler: Handlers = {
 			},
 		);
 	},
+
 	async DELETE() {
 		const reservations = await ReservationModel.list();
 

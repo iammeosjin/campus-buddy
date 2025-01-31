@@ -35,6 +35,7 @@ export const handler: Handlers = {
 		const type = req.headers.get('X-TYPE');
 
 		const resources = await ResourceModel.list();
+		console.log('resources', { resources, type });
 		if (type === 'all') {
 			return new Response(
 				JSON.stringify(

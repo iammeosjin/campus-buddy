@@ -119,6 +119,10 @@ export default function Reservations({ data }: {
 					href='/css/header.css'
 					rel='stylesheet'
 				/>
+				<link
+					href='/css/reservation.css'
+					rel='stylesheet'
+				/>
 			</Head>
 			<Header activePage='/reservations' operator={data.operator} />
 			<div class='p-4'>
